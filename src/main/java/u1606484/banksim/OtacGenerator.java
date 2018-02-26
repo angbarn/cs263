@@ -1,4 +1,5 @@
-import java.nio.ByteBuffer;
+package u1606484.banksim;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -13,36 +14,21 @@ public class OtacGenerator {
         'G', 'H', 'J', 'K', 'L', 'M', 'P', 'Q',
         'R', 'S', 'T', 'U', 'W', 'X', 'Y', 'Z'
     };
-    // /** How many bytes of the hash are used for a single code in total */
-    // private static final int hashSampleSize;
-    // /** How many bits make up a single chunk */
-    // private static final int chunkBits;
-    // /** How many chunks there are in total */
-    // private static final int chunkCount;
 
-    // static {
-    //     hashSampleSize = 5;
-    //     chunkCount = 8;
-    //     lookupBytes = (int) (Math.log(lookup.length) / Math.log(2));
+    private static final int CHUNK_BIT_COUNT = 5;
+    private static final int OTAC_LENGTH = 8;
 
-    //     assert (hashSampleSize * 8) == (chunkCount * lookupBytes);
-    // }
-
-    private static byte byteSubstring(byte[] bytes, int startPos, int size) {
+    private static byte byteSubstring(byte[] bytes, int startPos) {
         byte newByte = 0;
 
-        if (size > 8) {
-            throw new IllegalStateException("8 bits in a byte");
-        }
-
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < CHUNK_BIT_COUNT; i++) {
             int targetGlobalBit = startPos + i;
             int targetByte = targetGlobalBit / 8;
             int targetByteBit = targetGlobalBit % 8;
             byte singleBit = (byte)
                     ((bytes[targetByte] >> (7 - targetByteBit)) & 1);
             
-            newByte += singleBit << (size - 1 - i);
+            newByte += singleBit << (CHUNK_BIT_COUNT - 1 - i);
         }
 
         return newByte;
@@ -57,10 +43,10 @@ public class OtacGenerator {
     /**
      * Maps a hash to an 8 character code
      */
-    private static String hashToCode(byte[] hash, int codeLength) {
+    private static String hashToCode(byte[] hash) {
         StringBuilder out = new StringBuilder();
-        for (int i = 0; i < codeLength; i++) {
-            int lookupIndex = (int) byteSubstring(hash, i*5, 5);
+        for (int i = 0; i < OTAC_LENGTH; i++) {
+            int lookupIndex = (int) byteSubstring(hash, i*5);
             out.append(lookup[lookupIndex]);
         }
 
@@ -71,7 +57,7 @@ public class OtacGenerator {
         long timeValue = System.currentTimeMillis() / precision / 1000;
         try {
             byte[] totalHash = getHash(timeValue + content);
-            return hashToCode(totalHash, 8);
+            return hashToCode(totalHash);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             throw new IllegalStateException("Invalid hash algorithm");
@@ -90,7 +76,7 @@ public class OtacGenerator {
         // 00000001 10000000
         long lastSecond = 0;
         int precision = 10;
-        while (true) {
+        for (int i = 0; i < 10000; i++) {
             long currentSecond = System.currentTimeMillis() / 1000 % 60 / precision;
             if (currentSecond != lastSecond) {
                 lastSecond = currentSecond;
