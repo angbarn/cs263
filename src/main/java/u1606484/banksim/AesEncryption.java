@@ -8,8 +8,6 @@ import java.nio.file.Paths;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Base64;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -30,6 +28,11 @@ public class AesEncryption {
 	 * Algorithm to use for encryption/decryption
 	 */
 	private static final String ALGO = "AES";
+
+	/**
+	 * Length of key in bytes
+	 */
+	private static final int KEY_LENGTH = 16; // 128 bits
 
 	/**
 	 * Reads a file's binary data as an array of bytes
@@ -99,7 +102,9 @@ public class AesEncryption {
 			throw new IllegalArgumentException("Must encrypt or decrypt");
 		}
 
-		Key key = new SecretKeySpec(password.getBytes(), ALGO);
+		byte[] widthPassword = enforcePasswordLength(password);
+
+		Key key = new SecretKeySpec(widthPassword, ALGO);
 
 		Cipher c = Cipher.getInstance(ALGO);
 		c.init(opmode, key);
@@ -108,14 +113,27 @@ public class AesEncryption {
 		return c.doFinal(data);
 	}
 
-	public static void main(String[] arguments) {
-		SecureRandom random = new SecureRandom();
-		for (int i = 0; i < 10; i++) {
-			byte[] nonce = new byte[20];
-			random.nextBytes(nonce);
-			byte[] encodedNonce = Base64.getEncoder().encode(nonce);
-			String readableNonce = new String(encodedNonce);
-			System.out.println(readableNonce + " " + readableNonce.length());
-		}
+	/**
+	 * Ensures that passwords are the correct bit-length. <p> Passwords are
+	 * hashed, and the hash is truncated to the correct number of bits.
+	 * @param password Password to enforce length for
+	 */
+	private static byte[] enforcePasswordLength(String password) {
+		return enforcePasswordLength(password.getBytes());
+	}
+
+	/**
+	 * Ensures that passwords are the correct bit-length. <p> Passwords are
+	 * hashed, and the hash is truncated to the correct number of bits.
+	 * @param password Password to enforce length for
+	 */
+	private static byte[] enforcePasswordLength(byte[] password) {
+		byte[] passwordHash;
+		byte[] truncatedHash = new byte[KEY_LENGTH];
+
+		passwordHash = OtacGenerator.getHash(password);
+
+		System.arraycopy(passwordHash, 0, truncatedHash, 0, 16);
+		return truncatedHash;
 	}
 }
