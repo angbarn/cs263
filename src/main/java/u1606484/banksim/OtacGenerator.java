@@ -111,4 +111,37 @@ public class OtacGenerator {
 			Thread.sleep(1000);
 		}
 	}
+
+	public static byte[] getPasswordHash(String plaintext, byte[] salt,
+			int iterations) {
+		// Concatenate plaintext and password salt
+		byte[] plaintextBytes = plaintext.getBytes();
+		byte[] attemptBytes = new byte[plaintextBytes.length + salt.length];
+		System.arraycopy(plaintextBytes, 0, attemptBytes, 0,
+				plaintextBytes.length);
+		System.arraycopy(salt, 0, attemptBytes, plaintextBytes.length,
+				salt.length);
+
+		return getHash(attemptBytes, iterations);
+	}
+
+	public static boolean verifyPassword(String attempt, byte[] salt,
+			byte[] hash, int iterations) {
+		byte[] attemptHash = getPasswordHash(attempt, salt, iterations);
+
+		// While this means they're not equal, we should only ever be
+		// comparing hashes of the same length, or something has gone wrong
+		// elsewhere in the program
+		if (attemptHash.length != hash.length) {
+			throw new IllegalArgumentException("Hashes of differing length");
+		}
+
+		// Test each byte for equivalence
+		for (int i = 0; i < attemptHash.length; i++) {
+			if (attemptHash[i] != hash[i]) {
+				return false;
+			}
+		}
+		return true;
+	}
 }
