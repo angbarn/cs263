@@ -1,9 +1,12 @@
 package u1606484.banksim;
 
-import java.util.Base64;
-
 public class LoginSystem {
 	private static final int OTAC_PRECISION = 60 * 5;
+	private final DatabaseManager databaseManager;
+
+	public LoginSystem() {
+		databaseManager = new DatabaseManager();
+	}
 
 	private static byte[] getArbitraryBytes(int len) {
 		byte[] ret = new byte[len];
@@ -15,6 +18,7 @@ public class LoginSystem {
 
 	// TODO
 	private static byte[] getPassword(int userId) {
+
 //		return getArbitraryBytes((int) (Math.random() * 10 + 5));
 		return "hello".getBytes();
 	}
