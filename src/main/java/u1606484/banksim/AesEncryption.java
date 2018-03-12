@@ -131,7 +131,7 @@ public class AesEncryption {
 		byte[] passwordHash;
 		byte[] truncatedHash = new byte[KEY_LENGTH];
 
-		passwordHash = OtacGenerator.getHash(password);
+		passwordHash = SecurityService.getHash(password);
 
 		System.arraycopy(passwordHash, 0, truncatedHash, 0, 16);
 		return truncatedHash;
