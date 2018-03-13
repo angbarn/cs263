@@ -2,6 +2,7 @@ package u1606484.banksim;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import u1606484.banksim.interfaces.IOtacGenerator;
 import u1606484.banksim.interfaces.ITwoFactorService;
 
 public class DummyTwoFactor implements ITwoFactorService {
@@ -9,6 +10,16 @@ public class DummyTwoFactor implements ITwoFactorService {
     private static final String FILE_LOCATION =
             "C:\\Users\\angus\\Documents\\year2_local\\cs263\\cs263"
                     + "\\dummySend.txt";
+    private final IOtacGenerator generator;
+    private final int otacStepWindow;
+
+    public DummyTwoFactor(int otacLength, int otacStep, int otacStepWindow) {
+        this.generator = new OtacGenerator(
+                otacLength,
+                otacStep,
+                otacStepWindow);
+        this.otacStepWindow = otacStepWindow;
+    }
 
     /**
      * Transmits the provided OTAC to the provided address.
@@ -24,5 +35,15 @@ public class DummyTwoFactor implements ITwoFactorService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public String generateOtac(byte[] secretKey, int offset) {
+        return generator.generateOtac(secretKey, offset);
+    }
+
+    @Override
+    public int getWindowSize() {
+        return otacStepWindow;
     }
 }

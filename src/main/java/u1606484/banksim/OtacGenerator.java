@@ -16,18 +16,18 @@ import u1606484.banksim.interfaces.IOtacGenerator;
 
 public class OtacGenerator implements IOtacGenerator {
 
-    private static final int DIGIT_COUNT;
-    private static final long STEP_SIZE;
-    private static int windowSize;
+    private final int digitCount;
+    private final int stepSize;
+    private int windowSize;
 
-    static {
-        DIGIT_COUNT = 8;
-        STEP_SIZE = 30 * 1000;
-        windowSize = 2;
+    public OtacGenerator(int digitCount, int stepSize, int windowSize) {
+        this.digitCount = digitCount;
+        this.stepSize = stepSize;
+        this.windowSize = windowSize;
     }
 
     public static void main(String[] arguments) {
-        IOtacGenerator g = new OtacGenerator();
+        IOtacGenerator g = new OtacGenerator(8, 30 * 1000, 2);
 
         int byteRange = Byte.MAX_VALUE - Byte.MIN_VALUE;
         List<byte[]> bytesList = new ArrayList<>();
@@ -56,8 +56,8 @@ public class OtacGenerator implements IOtacGenerator {
     }
 
     private String getTimeString(int stepOffset) {
-        long millisTime = System.currentTimeMillis() / STEP_SIZE;
-        millisTime += stepOffset * STEP_SIZE;
+        long millisTime = System.currentTimeMillis() / stepSize;
+        millisTime += stepOffset * stepSize;
 
         StringBuilder t = new StringBuilder();
         t.append(Long.toHexString(millisTime).toUpperCase());
@@ -72,7 +72,7 @@ public class OtacGenerator implements IOtacGenerator {
     public String generateOtac(byte[] secretKey, int stepOffset) {
         String stringTime = getTimeString(stepOffset);
         String stringKey = Base64Controller.toHex(secretKey);
-        String stringCount = Integer.toString(DIGIT_COUNT);
+        String stringCount = Integer.toString(digitCount);
         return TOTP.generateTOTP512(stringTime, stringKey, stringCount);
     }
 
