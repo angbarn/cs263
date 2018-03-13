@@ -157,30 +157,36 @@ public class ApplicationDatabaseManager extends DatabaseManager {
 
         // Fetch password data
         String retrievalQuery =
-                "SELECT s.security_id, s.password, s.password_salt,"
-                        + "    s.password_hash_passes"
-                        + "FROM customer c"
-                        + "JOIN security s ON c.security_id = s.security_id"
+                "SELECT s.security_id, s.password, s.password_salt, "
+                        + "    s.password_hash_passes "
+                        + "FROM customer c "
+                        + "JOIN security s ON c.security_id = s.security_id "
                         + "WHERE c.customer_id = ?";
 
         ResultSet rs = exec(retrievalQuery, retrievalBindings, true);
 
-        int securityId;
-        byte[] password;
-        byte[] salt;
-        int passes;
+        int securityId = 0;
+        byte[] password = null;
+        byte[] salt = null;
+        int passes = 0;
+
+        boolean success;
 
         try {
-            securityId = rs.getInt(1);
-            password = rs.getBytes(2);
-            salt = rs.getBytes(3);
-            passes = rs.getInt(4);
+            if (rs.next()) {
+                securityId = rs.getInt(1);
+                password = rs.getBytes(2);
+                salt = rs.getBytes(3);
+                passes = rs.getInt(4);
+
+                success = SecurityService.verifyPassword(
+                        passwordAttempt, salt, password, passes);
+            } else {
+                success = false;
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
-        boolean success = SecurityService
-                .verifyPassword(passwordAttempt, salt, password, passes);
 
         // Update password if necessary
         if (success && passes < HASH_PASSES) {
@@ -191,9 +197,9 @@ public class ApplicationDatabaseManager extends DatabaseManager {
     }
 
     public byte[] fetchLoginKey(int userId) {
-        String retrievalQuery = "SELECT s.login_salt"
-                + "FROM customer c"
-                + "JOIN security s ON c.security_id"
+        String retrievalQuery = "SELECT s.login_salt "
+                + "FROM customer c "
+                + "JOIN security s ON c.security_id "
                 + "WHERE c.customer_id = ?";
         DatabaseBinding[] retrievalBindings = new DatabaseBinding[]{
                 new bInteger(1, userId)};
@@ -207,8 +213,8 @@ public class ApplicationDatabaseManager extends DatabaseManager {
     }
 
     public String fetchPhoneNumber(int userId) {
-        String retrievalQuery = "SELECT c.phone_number"
-                + "FROM customer c"
+        String retrievalQuery = "SELECT c.phone_number "
+                + "FROM customer c "
                 + "WHERE c.customer_id = ?";
         DatabaseBinding[] retrievalBindings = new DatabaseBinding[]{
                 new bInteger(1, userId)};

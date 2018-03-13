@@ -14,13 +14,13 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import u1606484.banksim.interfaces.IOtacGenerator;
 
-public class OtacGenerator implements IOtacGenerator {
+class OtacGenerator implements IOtacGenerator {
 
     private final int digitCount;
     private final int stepSize;
     private int windowSize;
 
-    public OtacGenerator(int digitCount, int stepSize, int windowSize) {
+    OtacGenerator(int digitCount, int stepSize, int windowSize) {
         this.digitCount = digitCount;
         this.stepSize = stepSize;
         this.windowSize = windowSize;
@@ -56,7 +56,8 @@ public class OtacGenerator implements IOtacGenerator {
     }
 
     private String getTimeString(int stepOffset) {
-        long millisTime = System.currentTimeMillis() / stepSize;
+        long millisTime = System.currentTimeMillis();
+        millisTime = (millisTime / stepSize) * stepSize;
         millisTime += stepOffset * stepSize;
 
         StringBuilder t = new StringBuilder();
