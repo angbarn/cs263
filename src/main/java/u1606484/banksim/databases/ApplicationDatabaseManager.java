@@ -22,7 +22,7 @@ public class ApplicationDatabaseManager extends DatabaseManager {
         ApplicationDatabaseManager m = new ApplicationDatabaseManager();
 
         try {
-            m.newCustomer("Jeremy", "Irons",
+            m.newCustomer("07000000000", "Jeremy", "Irons",
                     "jess continues to be a disappointment", 1,
                     "31 Cherry Street", "", "gu76 5pq", "Cambridgeshire");
 
@@ -46,21 +46,23 @@ public class ApplicationDatabaseManager extends DatabaseManager {
         }
     }
 
-    public int newCustomer(String firstName, String lastName,
-            String passwordPlaintext, int passwordHashPasses,
+    public int newCustomer(String phoneNumber, String firstName,
+            String lastName, String passwordPlaintext, int passwordHashPasses,
             String addressLine1, String addressLine2, String postcode,
             String county) {
         int addressId = newAddress(addressLine1, addressLine2, postcode,
                 county);
         int securityId = newSecurity(passwordPlaintext, passwordHashPasses);
 
-        String insertionQuery = "INSERT INTO customer (first_name, last_name, "
-                + "address_id, security_id) VALUES (?, ?, ?, ?)";
+        String insertionQuery = "INSERT INTO customer (phone_number, "
+                + "first_name, last_name, address_id, security_id) VALUES (?,"
+                + " ?, ?, ?, ?)";
         DatabaseBinding[] insertionBindings = new DatabaseBinding[]{
-                new bString(1, firstName),
-                new bString(2, lastName),
-                new bInteger(3, addressId),
-                new bInteger(4, securityId)};
+                new bString(1, phoneNumber),
+                new bString(2, firstName),
+                new bString(3, lastName),
+                new bInteger(4, addressId),
+                new bInteger(5, securityId)};
 
         String retrieveIdQuery = "SELECT last_insert_rowid()";
 
