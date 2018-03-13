@@ -23,7 +23,7 @@ public interface ITwoFactorService {
 
     default boolean verifyOtac(String attempt, byte[] secretKey) {
         return Stream
-                .iterate(0, x -> x + 1)
+                .iterate(0, x -> x - 1)
                 .limit(getWindowSize())
                 .map(i -> generateOtac(secretKey, i))
                 .map(attempt::equals)
