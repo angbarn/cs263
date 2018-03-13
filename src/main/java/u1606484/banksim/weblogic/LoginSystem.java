@@ -1,5 +1,6 @@
-package u1606484.banksim;
+package u1606484.banksim.weblogic;
 
+import u1606484.banksim.DummyTwoFactor;
 import u1606484.banksim.databases.ApplicationDatabaseManager;
 import u1606484.banksim.interfaces.ITwoFactorService;
 
