@@ -1,18 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
+
   <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="utf-8">
+    <title>Bananarama</title>
+    <link rel="stylesheet" href="main.css">
   </head>
+
   <body>
-    <h1>Wondough</h1>
-    <h2>The bank of the future</h2>
-    <p>
-      Welcome to the bank of the future, and the future is now.
-    </p>
-    <p>
-      Some people feel inclined to ask when the future is. Look at the clock on
-      your wall. What does it say? It says now. Because the future is now.
-    </p>
+    <div class="centre-float">
+      <div class="logo">
+        <img class="logo-image" alt="logo" src="wondough-logo.png">
+        <div>
+          <span class="logo-wondough">WONDOUGH</span>
+          <span class="logo-bank">BANK</span>
+        </div>
+      </div>
+      <form class="login-form" method="post" target="attempt_login">
+        <input class="${login_success}" type="text" name="account-id"
+               placeholder="Account ID"/>
+        <input class="${login_success}" type="password" name="password"
+               placeholder="Password"/>
+        <input type="submit">
+      </form>
+    </div>
   </body>
+
 </html>
