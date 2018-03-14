@@ -10,7 +10,7 @@ public class SecurityService {
     private static final Random RANDOM_GENERATOR = new SecureRandom();
     private static final int SALT_LENGTH_DEFAULT = 20;
 
-    private static byte[] getSalt(int byteCount) {
+    static byte[] getSalt(int byteCount) {
         byte[] bytes = new byte[byteCount];
         RANDOM_GENERATOR.nextBytes(bytes);
         return bytes;

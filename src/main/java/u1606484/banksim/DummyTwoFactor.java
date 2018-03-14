@@ -14,10 +14,7 @@ public class DummyTwoFactor implements ITwoFactorService {
     private final int otacStepWindow;
 
     public DummyTwoFactor(int otacLength, int otacStep, int otacStepWindow) {
-        this.generator = new OtacGenerator(
-                otacLength,
-                otacStep,
-                otacStepWindow);
+        this.generator = new OtacGenerator(otacLength, otacStep);
         this.otacStepWindow = otacStepWindow;
     }
 

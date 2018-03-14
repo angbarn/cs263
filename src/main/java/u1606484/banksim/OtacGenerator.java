@@ -16,18 +16,19 @@ import u1606484.banksim.interfaces.IOtacGenerator;
 
 class OtacGenerator implements IOtacGenerator {
 
+    /**
+     * Size of a single window, in milliseconds
+     */
+    private final long windowSize;
     private final int digitCount;
-    private final int stepSize;
-    private final int windowSize;
 
-    OtacGenerator(int digitCount, int stepSize, int windowSize) {
+    OtacGenerator(int digitCount, long windowSize) {
         this.digitCount = digitCount;
-        this.stepSize = stepSize;
         this.windowSize = windowSize;
     }
 
     public static void main(String[] arguments) {
-        IOtacGenerator g = new OtacGenerator(8, 30 * 1000, 2);
+        IOtacGenerator g = new OtacGenerator(8, 30000);
 
         int byteRange = Byte.MAX_VALUE - Byte.MIN_VALUE;
         List<byte[]> bytesList = new ArrayList<>();
@@ -45,31 +46,41 @@ class OtacGenerator implements IOtacGenerator {
                 .forEach(System.out::println);
 
         List<String> otacGeneration = bytesList.stream()
-                .map(g::generateOtac)
+                .map(bs -> g.generateOtac(bs, System.currentTimeMillis()))
                 .collect(Collectors.toList());
 
         otacGeneration.forEach(System.out::println);
     }
 
-    private String getTimeString(int stepOffset) {
-        long millisTime = System.currentTimeMillis();
-        millisTime = (millisTime / stepSize) * stepSize;
-        millisTime += stepOffset * stepSize;
+    private String getTimeString(long timeMillis) {
 
         StringBuilder t = new StringBuilder();
-        t.append(Long.toHexString(millisTime).toUpperCase());
+        t.append(Long.toHexString(timeMillis).toUpperCase());
         while (t.length() < 16) {
             t.insert(0, "0");
         }
+
+        System.out.println(timeMillis + "-> " + t);
 
         return t.toString();
     }
 
     @Override
-    public String generateOtac(byte[] secretKey, int stepOffset) {
-        String stringTime = getTimeString(stepOffset);
-        String stringKey = Base64Controller.toHex(secretKey);
+    public long getTimestamp(long rawTimeMillis, int offset) {
+        long timeMillis = (rawTimeMillis / windowSize);
+        timeMillis += offset * windowSize;
+
+        return timeMillis;
+    }
+
+    @Override
+    public String generateOtac(byte[] secretKey, long timeMillis) {
+        String stringTime = getTimeString(timeMillis);
+        String stringKey = Base64Controller.toHex(secretKey).toUpperCase();
         String stringCount = Integer.toString(digitCount);
+
+        System.out.println(stringKey);
+
         return TOTP.generateTOTP512(stringTime, stringKey, stringCount);
     }
 
@@ -289,6 +300,7 @@ class OtacGenerator implements IOtacGenerator {
                     while (steps.length() < 16) {
                         steps = "0" + steps;
                     }
+
                     String fmtTime = String.format("%1$-11s", testTime[i]);
                     String utcTime = df.format(new Date(testTime[i] * 1000));
                     System.out.print("|  " + fmtTime + "  |  " + utcTime +
