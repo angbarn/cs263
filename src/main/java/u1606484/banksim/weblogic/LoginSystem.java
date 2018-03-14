@@ -68,7 +68,7 @@ public class LoginSystem {
         return twoFactorService.verifyOtac(otacAttempt, secretKey);
     }
 
-    private void sendOtac(int userId) {
+    public void sendOtac(int userId) {
         String phoneNumber = databaseManager.fetchPhoneNumber(userId);
         String otac = generateOtac(userId);
 

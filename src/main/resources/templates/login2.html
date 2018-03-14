@@ -16,17 +16,18 @@
             <span class="logo-bank">BANK</span>
           </div>
         </div>
-        <form class="login-form" method="post" action="attempt_login">
+        <form class="login-form" method="post" target="attempt_login_2">
+          <input type="text" name="otac"
+                 placeholder="One-time password"/>
           <!--suppress HtmlUnknownAttribute -->
-          <input th:style="${box_styling}" type="text" name="username"
-                 placeholder="Account ID"/>
+          <input type="hidden" name="username" th:value="${username}"
+                 placeholder="One-time password"/>
           <!--suppress HtmlUnknownAttribute -->
-          <input th:style="${box_styling}" type="password" name="password"
-                 placeholder="Password"/>
+          <input type="hidden" name="password" th:value="${password}"
+                 placeholder="One-time password"/>
           <input type="submit">
         </form>
       </div>
     </div>
   </body>
-
 </html>

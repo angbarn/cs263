@@ -43,19 +43,12 @@ html, body {
     padding: 20px;
 }
 
-.login-form input[type=submit] {
+.login-form input[type=submit], .login-form input[type=hidden] {
     visibility: hidden;
     height: 0px;
     width: 0px;
     margin: 0px;
     padding: 0px;
-}
-
-.login-input {
-}
-
-.login-input-failure {
-    box-shadow: 5px 5px 20px #f00;
 }
 
 .logo div {
