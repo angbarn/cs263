@@ -1,5 +1,6 @@
-<html>
+<!DOCTYPE html>
 
+<html>
   <head>
     <meta charset="utf-8">
     <title>Bananarama</title>
@@ -7,21 +8,23 @@
   </head>
 
   <body>
-    <div class="centre-float">
-      <div class="logo">
-        <img class="logo-image" alt="logo" src="wondough-logo.png">
-        <div>
-          <span class="logo-wondough">WONDOUGH</span>
-          <span class="logo-bank">BANK</span>
+    <div class="page">
+      <div class="centre-float">
+        <div class="logo">
+          <img class="logo-image" alt="logo" src="wondough-logo.png">
+          <div>
+            <span class="logo-wondough">WONDOUGH</span>
+            <span class="logo-bank">BANK</span>
+          </div>
         </div>
+        <form class="login-form" method="post" target="attempt_login">
+          <input class="${login_success}" type="text" name="account-id"
+                 placeholder="Account ID"/>
+          <input class="${login_success}" type="password" name="password"
+                 placeholder="Password"/>
+          <input type="submit">
+        </form>
       </div>
-      <form class="login-form" method="post" target="attempt_login">
-        <input class="${login_success}" type="text" name="account-id"
-               placeholder="Account ID"/>
-        <input class="${login_success}" type="password" name="password"
-               placeholder="Password"/>
-        <input type="submit">
-      </form>
     </div>
   </body>
 

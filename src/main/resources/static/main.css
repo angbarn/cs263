@@ -1,5 +1,13 @@
-body {
+html, body {
   background-color: #3d3051;
+  height: 100%;
+  width: 100%;
+  margin: 0px;
+}
+
+.page {
+  height: 100%;
+  width: 100%;
 
   display: flex;
   justify-content: center;
@@ -78,7 +86,6 @@ body {
   justify-content: center;
   align-items: center;
   */
-  height: 100%;
 
   display: flex;
   align-content: center;
