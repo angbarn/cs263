@@ -4,11 +4,13 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Random;
+import java.util.function.Supplier;
 
 public class SecurityService {
 
     private static final Random RANDOM_GENERATOR = new SecureRandom();
     private static final int SALT_LENGTH_DEFAULT = 20;
+    public static final int SESSION_LENGTH = 30 * 60 * 1000;
 
     static byte[] getSalt(int byteCount) {
         byte[] bytes = new byte[byteCount];
@@ -18,6 +20,18 @@ public class SecurityService {
 
     public static byte[] getSalt() {
         return getSalt(SALT_LENGTH_DEFAULT);
+    }
+
+    public String generateSessionKey(int length) {
+        Supplier<Character> randomHex =
+                () -> (char) (RANDOM_GENERATOR.nextInt('z' - 'a') + 'a');
+
+        StringBuilder key = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            key.append(randomHex.get());
+        }
+
+        return key.toString();
     }
 
     private static byte[] getHash(byte[] message, int repeats) {
