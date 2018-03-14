@@ -18,7 +18,7 @@ class OtacGenerator implements IOtacGenerator {
 
     private final int digitCount;
     private final int stepSize;
-    private int windowSize;
+    private final int windowSize;
 
     OtacGenerator(int digitCount, int stepSize, int windowSize) {
         this.digitCount = digitCount;
@@ -49,10 +49,6 @@ class OtacGenerator implements IOtacGenerator {
                 .collect(Collectors.toList());
 
         otacGeneration.forEach(System.out::println);
-    }
-
-    public int getWindowSize() {
-        return windowSize;
     }
 
     private String getTimeString(int stepOffset) {

@@ -167,7 +167,7 @@ public class ApplicationDatabaseManager extends DatabaseManager {
 
         int securityId = 0;
         byte[] password = null;
-        byte[] salt = null;
+        byte[] salt;
         int passes = 0;
 
         boolean success;

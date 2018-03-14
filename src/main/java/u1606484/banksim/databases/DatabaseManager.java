@@ -30,14 +30,6 @@ class DatabaseManager {
         return conn;
     }
 
-    void commit() {
-        try {
-            conn.commit();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     ResultSet exec(String query, DatabaseBinding[] bindings,
             boolean resultsRequired) {
 

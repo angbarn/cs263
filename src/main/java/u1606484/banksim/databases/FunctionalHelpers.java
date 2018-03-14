@@ -33,7 +33,7 @@ class FunctionalHelpers {
 	 * @param <T> The type that the consumer will accept
 	 */
 	@FunctionalInterface
-	protected interface UncheckedConsumer<T> {
+	interface UncheckedConsumer<T> {
 
 		/**
 		 * Attempts to run a consumer, preparing to catch for {@link
@@ -68,7 +68,7 @@ class FunctionalHelpers {
 	 * @param <U> The second type that the bi-consumer will accept
 	 */
 	@FunctionalInterface
-	protected interface UncheckedBiConsumer<T, U> {
+	interface UncheckedBiConsumer<T, U> {
 
 		static <T, U> BiConsumer<T, U> escapeBiConsumer(
 				UncheckedBiConsumer<T, U> c) {
@@ -85,7 +85,7 @@ class FunctionalHelpers {
 	}
 
 	@FunctionalInterface
-	protected interface UncheckedFunction<T, R> {
+	interface UncheckedFunction<T, R> {
 
 		/**
 		 * Attempts to run a function, preparing to catch for {@link
@@ -120,9 +120,10 @@ class FunctionalHelpers {
 	 */
 	abstract static class DatabaseBinding<T> {
 
-		private int index;
-		private T value;
-		private Function<Integer, Function<T, Consumer<PreparedStatement>>>
+		private final int index;
+		private final T value;
+		private final Function<Integer, Function<T,
+				Consumer<PreparedStatement>>>
 				binder;
 
 		private DatabaseBinding(int index, T value,
