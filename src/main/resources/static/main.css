@@ -19,6 +19,7 @@ html, body {
   font-size: 3vw;
   margin: auto;
   display: inline-block;
+  text-align: center;
 }
 
 .login-form {

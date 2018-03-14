@@ -84,6 +84,10 @@ public class LoginSystem {
         boolean stageOne = verifyPassword(accountId, passwordAttempt);
         boolean stageTwo = verifyOtac(accountId, otacAttempt);
 
+        System.out.println(
+                "Login with " + accountId + ", " + passwordAttempt + ", "
+                        + otacAttempt + ": " + stageOne + "|" + stageTwo);
+
         return stageOne && stageTwo;
     }
 
