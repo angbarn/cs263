@@ -24,6 +24,11 @@ class FunctionalHelpers {
             Consumer<PreparedStatement>>> BIND_BYTES = (i) -> (v) ->
             UncheckedConsumer
                     .escapeConsumer((s) -> s.setBytes(i, v));
+    // Integer -> Long -> PreparedStatement
+    private static final Function<Integer, Function<Long,
+            Consumer<PreparedStatement>>> BIND_LONG = (i) -> (v) ->
+            UncheckedConsumer
+                    .escapeConsumer((s) -> s.setLong(i, v));
 
     /**
      * A consumer whose accept method is marked as throwing a {@link
@@ -155,6 +160,13 @@ class FunctionalHelpers {
 
         bBytes(int index, byte[] value) {
             super(index, value, BIND_BYTES);
+        }
+    }
+
+    static class bLong extends DatabaseBinding<Long> {
+
+        bLong(int index, Long value) {
+            super(index, value, BIND_LONG);
         }
     }
 }
