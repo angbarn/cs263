@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import u1606484.banksim.DummyTwoFactor;
-import u1606484.banksim.databases.ApplicationDatabaseManager;
+import u1606484.banksim.databases.TemporaryDatabase;
 import u1606484.banksim.interfaces.ITwoFactorService;
 
 @RunWith(SpringRunner.class)
@@ -52,8 +52,9 @@ public class TestWebController {
     }
 
     private Optional<String> fetchOtac(int userId) {
-        ApplicationDatabaseManager m = new ApplicationDatabaseManager();
+        TemporaryDatabase m = new TemporaryDatabase();
         Optional<byte[]> k = m.fetchLoginKey(userId);
+        m.close();
 
         if (k.isPresent()) {
             ITwoFactorService s = new DummyTwoFactor(8, 30 * 1000, 30);
