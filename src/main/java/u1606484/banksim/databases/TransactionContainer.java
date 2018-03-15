@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import u1606484.banksim.databases.FunctionalHelpers.DatabaseBinding;
+import u1606484.banksim.databases.FunctionalHelpers.UncheckedConsumer;
 
 class TransactionContainer {
 
@@ -34,6 +35,11 @@ class TransactionContainer {
         this.resultsRequiredFlags = resultsRequired.clone();
 
         this.size = queryStrings.length;
+    }
+
+    static void close(ResultSet[] rs) {
+        Arrays.stream(rs)
+                .forEach(UncheckedConsumer.escapeConsumer(ResultSet::close));
     }
 
     /**
