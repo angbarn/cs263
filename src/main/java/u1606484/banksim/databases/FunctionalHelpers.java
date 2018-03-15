@@ -36,7 +36,9 @@ class FunctionalHelpers {
             UncheckedFunction<ResultSet, T> handler) {
         try {
             if (rs.next()) {
-                return Optional.of(handler.apply(rs));
+                Optional<T> o = Optional.of(handler.apply(rs));
+                rs.close();
+                return o;
             } else {
                 return Optional.empty();
             }

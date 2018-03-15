@@ -135,8 +135,11 @@ public class ApplicationDatabaseManager extends DatabaseManager {
                 new DatabaseBinding[][]{insertionBindings, {}},
                 new boolean[]{false, true});
         ResultSet[] results = transaction.executeTransaction();
-        return UncheckedFunction.<ResultSet, Integer>escapeFunction(
+        int newId = UncheckedFunction.<ResultSet, Integer>escapeFunction(
                 x -> x.getInt(1)).apply(results[1]);
+        TransactionContainer.close(results);
+
+        return newId;
     }
 
     public int newAddress(String addressLine1, String addressLine2,
@@ -161,8 +164,11 @@ public class ApplicationDatabaseManager extends DatabaseManager {
 
         // Return ID of newly created address entry
         ResultSet[] results = transaction.executeTransaction();
-        return UncheckedFunction.<ResultSet, Integer>escapeFunction(
+        int newId = UncheckedFunction.<ResultSet, Integer>escapeFunction(
                 x -> x.getInt(1)).apply(results[1]);
+        TransactionContainer.close(results);
+
+        return newId;
     }
 
     public int newSecurity(String passwordPlaintext,
@@ -198,8 +204,11 @@ public class ApplicationDatabaseManager extends DatabaseManager {
 
         // Return the row ID of the newly created security entry
         ResultSet[] results = transaction.executeTransaction();
-        return UncheckedFunction.<ResultSet, Integer>escapeFunction(
+        int newId = UncheckedFunction.<ResultSet, Integer>escapeFunction(
                 x -> x.getInt(1)).apply(results[1]);
+        TransactionContainer.close(results);
+
+        return newId;
     }
 
     public void updatePassword(int securityId, String passwordPlaintext,
@@ -250,6 +259,8 @@ public class ApplicationDatabaseManager extends DatabaseManager {
 
                 success = SecurityService.verifyPassword(
                         passwordAttempt, salt, password, passes);
+
+                rs.close();
             } else {
                 success = false;
             }

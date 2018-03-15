@@ -49,7 +49,7 @@ class DatabaseManager {
                 return runQuery.executeQuery();
             } else {
                 runQuery.executeUpdate();
-                commit();
+                runQuery.close();
                 return null;
             }
         } catch (SQLException e) {
