@@ -137,7 +137,7 @@ public class ApplicationDatabaseManager extends DatabaseManager {
         ResultSet[] results = transaction.executeTransaction();
         int newId = UncheckedFunction.<ResultSet, Integer>escapeFunction(
                 x -> x.getInt(1)).apply(results[1]);
-        TransactionContainer.close(results);
+        transaction.close(results);
 
         return newId;
     }
@@ -166,7 +166,7 @@ public class ApplicationDatabaseManager extends DatabaseManager {
         ResultSet[] results = transaction.executeTransaction();
         int newId = UncheckedFunction.<ResultSet, Integer>escapeFunction(
                 x -> x.getInt(1)).apply(results[1]);
-        TransactionContainer.close(results);
+        transaction.close(results);
 
         return newId;
     }
@@ -206,7 +206,7 @@ public class ApplicationDatabaseManager extends DatabaseManager {
         ResultSet[] results = transaction.executeTransaction();
         int newId = UncheckedFunction.<ResultSet, Integer>escapeFunction(
                 x -> x.getInt(1)).apply(results[1]);
-        TransactionContainer.close(results);
+        transaction.close(results);
 
         return newId;
     }
@@ -261,6 +261,7 @@ public class ApplicationDatabaseManager extends DatabaseManager {
                         passwordAttempt, salt, password, passes);
 
                 rs.close();
+                commit();
             } else {
                 success = false;
             }

@@ -37,9 +37,15 @@ class TransactionContainer {
         this.size = queryStrings.length;
     }
 
-    static void close(ResultSet[] rs) {
+    void close(ResultSet[] rs) {
         Arrays.stream(rs)
                 .forEach(UncheckedConsumer.escapeConsumer(ResultSet::close));
+
+        try {
+            conn.commit();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

@@ -26,7 +26,7 @@ class DatabaseManager {
         }
     }
 
-    private void commit() {
+    void commit() {
         try {
             conn.commit();
         } catch (SQLException e) {
@@ -50,6 +50,7 @@ class DatabaseManager {
             } else {
                 runQuery.executeUpdate();
                 runQuery.close();
+                commit();
                 return null;
             }
         } catch (SQLException e) {
