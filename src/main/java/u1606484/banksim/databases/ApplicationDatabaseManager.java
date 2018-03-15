@@ -1,7 +1,7 @@
 package u1606484.banksim.databases;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 import u1606484.banksim.SecurityService;
 import u1606484.banksim.databases.FunctionalHelpers.DatabaseBinding;
@@ -12,8 +12,6 @@ import u1606484.banksim.databases.FunctionalHelpers.bLong;
 import u1606484.banksim.databases.FunctionalHelpers.bString;
 
 public class ApplicationDatabaseManager extends DatabaseManager {
-
-    private static final int HASH_PASSES = 1;
 
     public ApplicationDatabaseManager() {
         super();
@@ -134,9 +132,13 @@ public class ApplicationDatabaseManager extends DatabaseManager {
                 new String[]{insertionQuery, retrieveIdQuery},
                 new DatabaseBinding[][]{insertionBindings, {}},
                 new boolean[]{false, true});
-        ResultSet[] results = transaction.executeTransaction();
-        int newId = UncheckedFunction.<ResultSet, Integer>escapeFunction(
-                x -> x.getInt(1)).apply(results[1]);
+        List<Optional<ResultSet>> results = transaction.executeTransaction();
+
+        int newId = UncheckedFunction.<ResultSet, Integer>
+                escapeFunction(x -> x.getInt(1))
+                .apply(results.get(1).orElseThrow(
+                        () -> new IllegalStateException(
+                                "Failed to get last insert id")));
         transaction.close(results);
 
         return newId;
@@ -163,9 +165,12 @@ public class ApplicationDatabaseManager extends DatabaseManager {
                 new boolean[]{false, true});
 
         // Return ID of newly created address entry
-        ResultSet[] results = transaction.executeTransaction();
+        List<Optional<ResultSet>> results = transaction.executeTransaction();
+
         int newId = UncheckedFunction.<ResultSet, Integer>escapeFunction(
-                x -> x.getInt(1)).apply(results[1]);
+                x -> x.getInt(1)).apply(results.get(1).orElseThrow(
+                () -> new IllegalStateException(
+                        "Failed to get last insert id")));
         transaction.close(results);
 
         return newId;
@@ -203,9 +208,12 @@ public class ApplicationDatabaseManager extends DatabaseManager {
                 new boolean[]{false, true});
 
         // Return the row ID of the newly created security entry
-        ResultSet[] results = transaction.executeTransaction();
+        List<Optional<ResultSet>> results = transaction.executeTransaction();
+
         int newId = UncheckedFunction.<ResultSet, Integer>escapeFunction(
-                x -> x.getInt(1)).apply(results[1]);
+                x -> x.getInt(1)).apply(results.get(1).orElseThrow(
+                () -> new IllegalStateException(
+                        "Failed to get last insert id")));
         transaction.close(results);
 
         return newId;
@@ -229,7 +237,7 @@ public class ApplicationDatabaseManager extends DatabaseManager {
         exec(updateQuery, retrievalBindings, false);
     }
 
-    public boolean verifyPassword(int userId, String passwordAttempt) {
+    public Optional<PasswordData> getPasswordData(int userId) {
         DatabaseBinding[] retrievalBindings = new DatabaseBinding[]{
                 new bInteger(1, userId)};
 
@@ -243,38 +251,14 @@ public class ApplicationDatabaseManager extends DatabaseManager {
 
         ResultSet rs = exec(retrievalQuery, retrievalBindings, true);
 
-        int securityId = 0;
-        byte[] password = null;
-        byte[] salt;
-        int passes = 0;
+        return FunctionalHelpers.attemptSingleRetrieval(rs, r -> {
+            int securityId = rs.getInt(1);
+            byte[] password = rs.getBytes(2);
+            byte[] salt = rs.getBytes(3);
+            int passes = rs.getInt(4);
 
-        boolean success;
-
-        try {
-            if (rs.next()) {
-                securityId = rs.getInt(1);
-                password = rs.getBytes(2);
-                salt = rs.getBytes(3);
-                passes = rs.getInt(4);
-
-                success = SecurityService.verifyPassword(
-                        passwordAttempt, salt, password, passes);
-
-                rs.close();
-                commit();
-            } else {
-                success = false;
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        // Update password if necessary
-        if (success && passes < HASH_PASSES) {
-            updatePassword(securityId, passwordAttempt, password, HASH_PASSES);
-        }
-
-        return success;
+            return new PasswordData(securityId, password, salt, passes);
+        });
     }
 
     public Optional<byte[]> fetchLoginKey(int userId) {
