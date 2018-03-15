@@ -2,6 +2,7 @@ package u1606484.banksim.databases;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 import u1606484.banksim.SecurityService;
 import u1606484.banksim.databases.FunctionalHelpers.DatabaseBinding;
 import u1606484.banksim.databases.FunctionalHelpers.UncheckedFunction;
@@ -26,38 +27,12 @@ public class ApplicationDatabaseManager extends DatabaseManager {
                     "jess continues to be a disappointment", 1,
                     "31 Cherry Street", "", "gu76 5pq", "Cambridgeshire");
 
-            SessionKeyPackage key = m.getSessionKeyData(1);
-            String genKey = SecurityService
-                    .generateSessionKey(SecurityService.SESSION_KEY_LENGTH);
-
-            System.out.println(key);
-            System.out.println(m.getUserId(key.getSessionKey()));
-            m.assignSessionKey(
-                    1,
-                    genKey,
-                    System.currentTimeMillis()
-                            + SecurityService.SESSION_LENGTH);
-            System.out.println(m.getUserId(key.getSessionKey()));
-            System.out.println(m.getUserId(genKey));
-
-            System.out.println(
-                    m.getSessionKeyData(1).getOtacStage() == 1 ? "user otac'd"
-                            : "nope");
-            m.setOtacAuthenticated(genKey, 0);
-            System.out.println(
-                    m.getSessionKeyData(1).getOtacStage() == 1 ? "user otac'd"
-                            : "nope");
-            m.setOtacAuthenticated(genKey, 1);
-            System.out.println(
-                    m.getSessionKeyData(1).getOtacStage() == 1 ? "user otac'd"
-                            : "nope");
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public SessionKeyPackage getSessionKeyData(int userId) {
+    public Optional<SessionKeyPackage> getSessionKeyData(int userId) {
         String retrievalQuery = ""
                 + "SELECT session_key, otac_authenticated "
                 + "FROM session "
@@ -82,12 +57,13 @@ public class ApplicationDatabaseManager extends DatabaseManager {
             throw new RuntimeException(e);
         }
 
-        return sessionKey;
+        return Optional.ofNullable(sessionKey);
     }
 
-    public int getUserId(String sessionKey) {
+    public Optional<UserAuthenticationPackage> getUserData(String sessionKey) {
         String retrievalQuery = ""
-                + "SELECT customer_id FROM session "
+                + "SELECT customer_id, otac_authenticated "
+                + "FROM session "
                 + "WHERE expiry > ? AND session_key = ?";
         DatabaseBinding[] retrievalBindings = new DatabaseBinding[]{
                 new bLong(1, System.currentTimeMillis() / 2),
@@ -95,18 +71,21 @@ public class ApplicationDatabaseManager extends DatabaseManager {
         };
         ResultSet idResult = exec(retrievalQuery, retrievalBindings, true);
 
-        int userId = -1;
+        UserAuthenticationPackage data = null;
 
         try {
             idResult.next();
             if (!idResult.isClosed()) {
-                userId = idResult.getInt(1);
+                int userId = idResult.getInt(1);
+                int userOtac = idResult.getInt(2);
+
+                data = new UserAuthenticationPackage(userId, userOtac);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
-        return userId;
+        return Optional.ofNullable(data);
     }
 
     public void assignSessionKey(int userId, String sessionKey,
@@ -305,7 +284,7 @@ public class ApplicationDatabaseManager extends DatabaseManager {
         return success;
     }
 
-    public byte[] fetchLoginKey(int userId) {
+    public Optional<byte[]> fetchLoginKey(int userId) {
         String retrievalQuery = ""
                 + "SELECT s.login_salt "
                 + "FROM customer c "
@@ -316,13 +295,18 @@ public class ApplicationDatabaseManager extends DatabaseManager {
         ResultSet rs = exec(retrievalQuery, retrievalBindings, true);
 
         try {
-            return rs.getBytes(1);
+            rs.next();
+            if (!rs.isClosed()) {
+                return Optional.of(rs.getBytes(1));
+            } else {
+                return Optional.empty();
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public String fetchPhoneNumber(int userId) {
+    public Optional<String> fetchPhoneNumber(int userId) {
         String retrievalQuery = ""
                 + "SELECT c.phone_number "
                 + "FROM customer c "
@@ -332,7 +316,12 @@ public class ApplicationDatabaseManager extends DatabaseManager {
         ResultSet rs = exec(retrievalQuery, retrievalBindings, true);
 
         try {
-            return rs.getString(1);
+            rs.next();
+            if (!rs.isClosed()) {
+                return Optional.of(rs.getString(1));
+            } else {
+                return Optional.empty();
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
