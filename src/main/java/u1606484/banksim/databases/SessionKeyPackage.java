@@ -6,15 +6,15 @@ public class SessionKeyPackage {
 
     private final IPair<String, Integer> pair;
 
-    SessionKeyPackage(String sessionKey, int otacLevel) {
-        pair = new GenericImmutablePair<>(sessionKey, otacLevel);
+    SessionKeyPackage(String sessionKey, int otacStage) {
+        pair = new GenericImmutablePair<>(sessionKey, otacStage);
     }
 
     public String getSessionKey() {
         return pair.getFirst();
     }
 
-    public int getOtacLevel() {
+    public int getOtacStage() {
         return pair.getSecond();
     }
 }

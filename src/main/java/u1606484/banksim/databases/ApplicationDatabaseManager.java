@@ -38,7 +38,7 @@ public class ApplicationDatabaseManager extends DatabaseManager {
                 + "FROM session "
                 + "WHERE expiry > ? AND customer_id = ?";
         DatabaseBinding[] retrievalBindings = new DatabaseBinding[]{
-                new bLong(1, System.currentTimeMillis() / 2),
+                new bLong(1, System.currentTimeMillis()),
                 new bInteger(2, userId)
         };
         ResultSet keyResult = exec(retrievalQuery, retrievalBindings, true);
@@ -70,18 +70,7 @@ public class ApplicationDatabaseManager extends DatabaseManager {
 
     public void assignSessionKey(int userId, String sessionKey,
             long expiry) {
-        if (getSessionKeyData(userId) == null) {
-            String insertionQuery = ""
-                    + "INSERT INTO session "
-                    + "(session_key, customer_id, expiry) "
-                    + "VALUES (?, ?, ?)";
-            DatabaseBinding[] insertionBindings = new DatabaseBinding[]{
-                    new bString(1, sessionKey),
-                    new bInteger(2, userId),
-                    new bLong(3, expiry)};
-
-            exec(insertionQuery, insertionBindings, false);
-        } else {
+        if (getSessionKeyData(userId).isPresent()) {
             String updateQuery = ""
                     + "UPDATE session "
                     + "SET session_key = ?, expiry = ? "
@@ -92,6 +81,17 @@ public class ApplicationDatabaseManager extends DatabaseManager {
                     new bInteger(3, userId)};
 
             exec(updateQuery, updateBindings, false);
+        } else {
+            String insertionQuery = ""
+                    + "INSERT INTO session "
+                    + "(session_key, customer_id, expiry) "
+                    + "VALUES (?, ?, ?)";
+            DatabaseBinding[] insertionBindings = new DatabaseBinding[]{
+                    new bString(1, sessionKey),
+                    new bInteger(2, userId),
+                    new bLong(3, expiry)};
+
+            exec(insertionQuery, insertionBindings, false);
         }
     }
 
@@ -208,12 +208,13 @@ public class ApplicationDatabaseManager extends DatabaseManager {
                 .getPasswordHash(passwordPlaintext, passwordSalt,
                         hashIterations);
         DatabaseBinding[] retrievalBindings = new DatabaseBinding[]{
-                new bInteger(2, hashIterations),
-                new bInteger(3, securityId),
-                new bBytes(1, newPassword)};
+                new bBytes(1, newPassword),
+                new bBytes(2, passwordSalt),
+                new bInteger(3, hashIterations),
+                new bInteger(4, securityId)};
         String updateQuery = ""
-                + "UPDATE "
-                + "SET password=?, password_hash_passes=?"
+                + "UPDATE security "
+                + "SET password=?, password_salt=?, password_hash_passes=? "
                 + "WHERE security_id=?";
 
         exec(updateQuery, retrievalBindings, false);
