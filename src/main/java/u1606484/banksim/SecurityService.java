@@ -11,7 +11,7 @@ public class SecurityService {
     private static final Random RANDOM_GENERATOR = new SecureRandom();
     private static final int SALT_LENGTH_DEFAULT = 20;
     public static final int SESSION_KEY_LENGTH = 15;
-    public static final int SESSION_LENGTH = 30 * 60 * 1000;
+    public static final int SESSION_EXPIRY_LENGTH = 30 * 60 * 1000;
 
     static byte[] getSalt(int byteCount) {
         byte[] bytes = new byte[byteCount];
