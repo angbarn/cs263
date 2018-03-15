@@ -10,6 +10,7 @@ public class SecurityService {
 
     private static final Random RANDOM_GENERATOR = new SecureRandom();
     private static final int SALT_LENGTH_DEFAULT = 20;
+    public static final int SESSION_KEY_LENGTH = 15;
     public static final int SESSION_LENGTH = 30 * 60 * 1000;
 
     static byte[] getSalt(int byteCount) {
@@ -22,7 +23,7 @@ public class SecurityService {
         return getSalt(SALT_LENGTH_DEFAULT);
     }
 
-    public String generateSessionKey(int length) {
+    public static String generateSessionKey(int length) {
         Supplier<Character> randomHex =
                 () -> (char) (RANDOM_GENERATOR.nextInt('z' - 'a') + 'a');
 
