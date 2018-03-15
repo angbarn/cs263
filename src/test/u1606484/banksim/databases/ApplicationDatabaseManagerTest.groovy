@@ -40,17 +40,29 @@ class ApplicationDatabaseManagerTest extends GroovyTestCase {
         assertEquals(m.fetchPhoneNumber(1).get(), PHONE_NUMBER)
     }
 
+    private static boolean testPassword(String attempt) {
+        Optional<PasswordData> data = m.getPasswordData(1)
+        return SecurityService.verifyPassword(
+                attempt,
+                data.get().getPasswordSalt(),
+                data.get().getPasswordHash(),
+                data.get().getPasses())
+    }
+
     void testVerifyPassword() {
-        assertFalse(m.verifyPassword(1, PASSWORD + "-"))
-        assertTrue(m.verifyPassword(1, PASSWORD))
+        assertTrue(testPassword(PASSWORD))
+        assertFalse(testPassword(PASSWORD + " "))
     }
 
     void testUpdatePassword() {
         String newPassword = PASSWORD + "###"
         m.updatePassword(1, newPassword, SecurityService.getSalt(), PASSWORD_PASSES + 5)
-        assertTrue(m.verifyPassword(1, newPassword))
+
+        assertFalse(testPassword(PASSWORD))
+        assertFalse(testPassword(PASSWORD + "-"))
+        assertTrue(testPassword(PASSWORD + "###"))
+
         m.updatePassword(1, PASSWORD, SecurityService.getSalt(), PASSWORD_PASSES)
-        assertTrue(m.verifyPassword(1, PASSWORD))
     }
 
 

@@ -44,6 +44,7 @@ public class TestWebController {
     private ResultActions attemptLogin2(String u, String s, String o)
             throws Exception {
         return mvc.perform(MockMvcRequestBuilders.post("/")
+                .param("username", u)
                 .param("otac", o)
                 .cookie(new Cookie("session_token", s))
                 .accept(MediaType.APPLICATION_JSON))
@@ -100,5 +101,26 @@ public class TestWebController {
                 .string(containsString(
                         "<title>Logged in to Wondough</title>")));
 
+    }
+
+    @Test
+    public void attemptFailOtac() throws Exception {
+        MvcResult r = attemptLogin("1", "12345").andReturn();
+        Optional<Cookie> c = Optional
+                .ofNullable(r.getResponse().getCookie("session_token"));
+
+        if (!c.isPresent()) {
+            throw new IllegalStateException("Session token not set correctly");
+        }
+
+        Optional<String> otac = fetchOtac(1);
+
+        if (!otac.isPresent()) {
+            throw new IllegalStateException("no otac");
+        }
+
+        attemptLogin2("1", c.get().getValue(), "aaaaaaaa").andExpect(content()
+                .string(containsString(
+                        "<title>Please provide one-time password</title>")));
     }
 }
