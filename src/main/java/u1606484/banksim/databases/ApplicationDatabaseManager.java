@@ -2,12 +2,12 @@ package u1606484.banksim.databases;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import u1606484.banksim.Base64Controller;
 import u1606484.banksim.SecurityService;
 import u1606484.banksim.databases.FunctionalHelpers.DatabaseBinding;
 import u1606484.banksim.databases.FunctionalHelpers.UncheckedFunction;
 import u1606484.banksim.databases.FunctionalHelpers.bBytes;
 import u1606484.banksim.databases.FunctionalHelpers.bInteger;
+import u1606484.banksim.databases.FunctionalHelpers.bLong;
 import u1606484.banksim.databases.FunctionalHelpers.bString;
 
 public class ApplicationDatabaseManager extends DatabaseManager {
@@ -26,24 +26,126 @@ public class ApplicationDatabaseManager extends DatabaseManager {
                     "jess continues to be a disappointment", 1,
                     "31 Cherry Street", "", "gu76 5pq", "Cambridgeshire");
 
-            String dataQuery = "SELECT first_name, last_name, password, "
-                    + "address_1, county, postcode FROM customer c JOIN "
-                    + "address a ON a.address_id = c.address_id JOIN "
-                    + "security s ON s.security_id = c.security_id";
-            ResultSet r = m.exec(dataQuery, new DatabaseBinding[]{}, true);
+            SessionKeyPackage key = m.getSessionKeyData(1);
+            String genKey = SecurityService
+                    .generateSessionKey(SecurityService.SESSION_KEY_LENGTH);
 
-            while (r.next()) {
-                System.out.println(
-                        r.getString(1) + " " + r.getString(2) + "\n-----\n" + r
-                                .getString(4) + "\n" + r.getString(5) + "\n"
-                                + r
-                                .getString(6) + "\n-----\n" + Base64Controller
-                                .toBase64(r.getString(3)) + "\n\n");
-            }
+            System.out.println(key);
+            System.out.println(m.getUserId(key.getSessionKey()));
+            m.assignSessionKey(
+                    1,
+                    genKey,
+                    System.currentTimeMillis()
+                            + SecurityService.SESSION_LENGTH);
+            System.out.println(m.getUserId(key.getSessionKey()));
+            System.out.println(m.getUserId(genKey));
+
+            System.out.println(
+                    m.getSessionKeyData(1).getOtacStage() == 1 ? "user otac'd"
+                            : "nope");
+            m.setOtacAuthenticated(genKey, 0);
+            System.out.println(
+                    m.getSessionKeyData(1).getOtacStage() == 1 ? "user otac'd"
+                            : "nope");
+            m.setOtacAuthenticated(genKey, 1);
+            System.out.println(
+                    m.getSessionKeyData(1).getOtacStage() == 1 ? "user otac'd"
+                            : "nope");
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public SessionKeyPackage getSessionKeyData(int userId) {
+        String retrievalQuery = ""
+                + "SELECT session_key, otac_authenticated "
+                + "FROM session "
+                + "WHERE expiry > ? AND customer_id = ?";
+        DatabaseBinding[] retrievalBindings = new DatabaseBinding[]{
+                new bLong(1, System.currentTimeMillis() / 2),
+                new bInteger(2, userId)
+        };
+        ResultSet keyResult = exec(retrievalQuery, retrievalBindings, true);
+
+        SessionKeyPackage sessionKey = null;
+
+        try {
+            keyResult.next();
+            if (!keyResult.isClosed()) {
+                String key = keyResult.getString(1);
+                int authenticationStage = keyResult.getInt(2);
+
+                sessionKey = new SessionKeyPackage(key, authenticationStage);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return sessionKey;
+    }
+
+    public int getUserId(String sessionKey) {
+        String retrievalQuery = ""
+                + "SELECT customer_id FROM session "
+                + "WHERE expiry > ? AND session_key = ?";
+        DatabaseBinding[] retrievalBindings = new DatabaseBinding[]{
+                new bLong(1, System.currentTimeMillis() / 2),
+                new bString(2, sessionKey)
+        };
+        ResultSet idResult = exec(retrievalQuery, retrievalBindings, true);
+
+        int userId = -1;
+
+        try {
+            idResult.next();
+            if (!idResult.isClosed()) {
+                userId = idResult.getInt(1);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return userId;
+    }
+
+    public void assignSessionKey(int userId, String sessionKey,
+            long expiry) {
+        if (getSessionKeyData(userId) == null) {
+            String insertionQuery = ""
+                    + "INSERT INTO session "
+                    + "(session_key, customer_id, expiry) "
+                    + "VALUES (?, ?, ?)";
+            DatabaseBinding[] insertionBindings = new DatabaseBinding[]{
+                    new bString(1, sessionKey),
+                    new bInteger(2, userId),
+                    new bLong(3, expiry)};
+
+            exec(insertionQuery, insertionBindings, false);
+        } else {
+            String updateQuery = ""
+                    + "UPDATE session "
+                    + "SET session_key = ?, expiry = ? "
+                    + "WHERE customer_id = ?";
+            DatabaseBinding[] updateBindings = new DatabaseBinding[]{
+                    new bString(1, sessionKey),
+                    new bLong(2, expiry),
+                    new bInteger(3, userId)};
+
+            exec(updateQuery, updateBindings, false);
+        }
+    }
+
+    public void setOtacAuthenticated(String sessionKey, int otacStage) {
+        String updateQuery = ""
+                + "UPDATE session SET "
+                + "otac_authenticated = ? "
+                + "WHERE session_key = ?";
+        DatabaseBinding[] updateBindings = new DatabaseBinding[]{
+                new bInteger(1, otacStage),
+                new bString(2, sessionKey)
+        };
+        exec(updateQuery, updateBindings, false);
     }
 
     public int newCustomer(String phoneNumber, String firstName,
@@ -54,9 +156,11 @@ public class ApplicationDatabaseManager extends DatabaseManager {
                 county);
         int securityId = newSecurity(passwordPlaintext, passwordHashPasses);
 
-        String insertionQuery = "INSERT INTO customer (phone_number, "
-                + "first_name, last_name, address_id, security_id) VALUES (?,"
-                + " ?, ?, ?, ?)";
+        String insertionQuery = ""
+                + "INSERT INTO customer"
+                + "(phone_number, first_name, last_name, address_id, "
+                + "    security_id) "
+                + "VALUES (?, ?, ?, ?, ?)";
         DatabaseBinding[] insertionBindings = new DatabaseBinding[]{
                 new bString(1, phoneNumber),
                 new bString(2, firstName),
@@ -78,8 +182,10 @@ public class ApplicationDatabaseManager extends DatabaseManager {
 
     public int newAddress(String addressLine1, String addressLine2,
             String postcode, String county) {
-        String insertionQuery = "INSERT INTO address (address_1, address_2, "
-                + "postcode, county) VALUES (?, ?, ?, ?)";
+        String insertionQuery = ""
+                + "INSERT INTO address "
+                + "(address_1, address_2, postcode, county) "
+                + "VALUES (?, ?, ?, ?)";
         DatabaseBinding[] insertionBindings = new DatabaseBinding[]{
                 new bString(1, addressLine1),
                 new bString(2, addressLine2),
@@ -117,9 +223,11 @@ public class ApplicationDatabaseManager extends DatabaseManager {
                 new bBytes(4, passwordHash),
                 new bBytes(5, passwordSalt),
                 new bInteger(6, passwordHashPasses)};
-        String insertionQuery = "INSERT INTO security (login_salt, "
-                + "support_in_salt, support_out_salt, password, password_salt,"
-                + " password_hash_passes) VALUES (?, ?, ?, ?, ?, ?)";
+        String insertionQuery = ""
+                + "INSERT INTO security "
+                + "(login_salt, support_in_salt, support_out_salt, password, "
+                + "    password_salt, password_hash_passes) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
 
         String retrieveIdQuery = "SELECT last_insert_rowid()";
 
@@ -144,8 +252,9 @@ public class ApplicationDatabaseManager extends DatabaseManager {
                 new bInteger(2, hashIterations),
                 new bInteger(3, securityId),
                 new bBytes(1, newPassword)};
-        String updateQuery = "UPDATE"
-                + "password=?, password_hash_passes=?"
+        String updateQuery = ""
+                + "UPDATE "
+                + "SET password=?, password_hash_passes=?"
                 + "WHERE security_id=?";
 
         exec(updateQuery, retrievalBindings, false);
@@ -197,7 +306,8 @@ public class ApplicationDatabaseManager extends DatabaseManager {
     }
 
     public byte[] fetchLoginKey(int userId) {
-        String retrievalQuery = "SELECT s.login_salt "
+        String retrievalQuery = ""
+                + "SELECT s.login_salt "
                 + "FROM customer c "
                 + "JOIN security s ON c.security_id "
                 + "WHERE c.customer_id = ?";
@@ -213,7 +323,8 @@ public class ApplicationDatabaseManager extends DatabaseManager {
     }
 
     public String fetchPhoneNumber(int userId) {
-        String retrievalQuery = "SELECT c.phone_number "
+        String retrievalQuery = ""
+                + "SELECT c.phone_number "
                 + "FROM customer c "
                 + "WHERE c.customer_id = ?";
         DatabaseBinding[] retrievalBindings = new DatabaseBinding[]{

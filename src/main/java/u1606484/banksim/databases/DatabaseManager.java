@@ -26,6 +26,14 @@ class DatabaseManager {
         }
     }
 
+    private void commit() {
+        try {
+            conn.commit();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     Connection getConnection() {
         return conn;
     }
@@ -41,6 +49,7 @@ class DatabaseManager {
                 return runQuery.executeQuery();
             } else {
                 runQuery.executeUpdate();
+                commit();
                 return null;
             }
         } catch (SQLException e) {
