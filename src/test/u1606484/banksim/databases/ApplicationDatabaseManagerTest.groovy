@@ -47,7 +47,7 @@ class ApplicationDatabaseManagerTest extends GroovyTestCase {
 
     void testUpdatePassword() {
         String newPassword = PASSWORD + "###"
-        m.updatePassword(1, newPassword, SecurityService.getSalt(), PASSWORD_PASSES)
+        m.updatePassword(1, newPassword, SecurityService.getSalt(), PASSWORD_PASSES + 5)
         assertTrue(m.verifyPassword(1, newPassword))
         m.updatePassword(1, PASSWORD, SecurityService.getSalt(), PASSWORD_PASSES)
         assertTrue(m.verifyPassword(1, PASSWORD))
