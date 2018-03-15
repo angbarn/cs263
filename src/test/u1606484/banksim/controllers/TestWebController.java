@@ -1,13 +1,13 @@
 package u1606484.banksim.controllers;
 
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.result
         .MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result
         .MockMvcResultMatchers.status;
 
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.Optional;
+import javax.servlet.http.Cookie;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import u1606484.banksim.DummyTwoFactor;
+import u1606484.banksim.databases.ApplicationDatabaseManager;
+import u1606484.banksim.interfaces.ITwoFactorService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -27,42 +32,73 @@ public class TestWebController {
     @Autowired
     private MockMvc mvc;
 
-    @Test
-    public void getHello() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/")
+    private ResultActions attemptLogin(String u, String p)
+            throws Exception {
+        return mvc.perform(MockMvcRequestBuilders.post("/")
+                .param("username", u)
+                .param("password", p)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content()
-                        .string(equalTo("Greetings from Spring Boot!")));
+                .andExpect(status().isOk());
+    }
+
+    private ResultActions attemptLogin2(String u, String s, String o)
+            throws Exception {
+        return mvc.perform(MockMvcRequestBuilders.post("/")
+                .param("otac", o)
+                .cookie(new Cookie("session_token", s))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    private Optional<String> fetchOtac(int userId) {
+        ApplicationDatabaseManager m = new ApplicationDatabaseManager();
+        Optional<byte[]> k = m.fetchLoginKey(userId);
+
+        if (k.isPresent()) {
+            ITwoFactorService s = new DummyTwoFactor(8, 30 * 1000, 30);
+            return Optional.of(s.generateOtac(k.get()));
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Test
-    public void attemptLoginStage1() throws Exception {
-        // String -> String -> String -> ()
-        Function<String, Function<String, Consumer<String>>> attempt = m -> u
-                -> p -> {
-            try {
-                mvc.perform(MockMvcRequestBuilders.post("/attempt_login", u, p)
-                        .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isOk())
-                        .andExpect(content().string(equalTo(m)));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        };
+    public void attemptLoginNoPassword() throws Exception {
+        attemptLogin("1", "placeholder=\"Account ID\"")
+                .andExpect(content().string(containsString("Account")));
+    }
 
-        String failRedirect = "redirect:/index?loginSuccess=failure";
-        String successRedirect = "redirect:/attempt_login_2";
+    @Test
+    public void attemptLoginNoUsername() throws Exception {
+        attemptLogin("", "").andExpect(content()
+                .string(containsString("placeholder=\"Account ID\"")));
+    }
 
-        Function<String, Consumer<String>> fail = attempt.apply(failRedirect);
-        Function<String, Consumer<String>> succ = attempt
-                .apply(successRedirect);
+    @Test
+    public void attemptLoginCorrect() throws Exception {
+        attemptLogin("1", "12345").andExpect(content()
+                .string(containsString("placeholder=\"One-time password\"")));
+    }
 
-        // Correct username, incorrect password
-        fail.apply("1").accept("");
-        // Incorrect username, correct password
-        fail.apply("1000").accept("jess continues to be a disappointment");
-        // Correct both
-        succ.apply("1").accept("jess continues to be a disappointment");
+    @Test
+    public void attemptOtac() throws Exception {
+        MvcResult r = attemptLogin("1", "12345").andReturn();
+        Optional<Cookie> c = Optional
+                .ofNullable(r.getResponse().getCookie("session_token"));
+
+        if (!c.isPresent()) {
+            throw new IllegalStateException("Session token not set correctly");
+        }
+
+        Optional<String> otac = fetchOtac(1);
+
+        if (!otac.isPresent()) {
+            throw new IllegalStateException("no otac");
+        }
+
+        attemptLogin2("1", c.get().getValue(), otac.get()).andExpect(content()
+                .string(containsString(
+                        "<title>Logged in to Wondough</title>")));
+
     }
 }
