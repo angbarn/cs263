@@ -60,8 +60,6 @@ class OtacGenerator implements IOtacGenerator {
             t.insert(0, "0");
         }
 
-        System.out.println(timeMillis + "-> " + t);
-
         return t.toString();
     }
 
