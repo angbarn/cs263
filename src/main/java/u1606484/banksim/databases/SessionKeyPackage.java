@@ -1,32 +1,20 @@
 package u1606484.banksim.databases;
 
-class SessionKeyPackage {
+import u1606484.banksim.interfaces.IPair;
 
-    private final String sessionKey;
-    private final int otacStage;
+public class SessionKeyPackage {
 
-    SessionKeyPackage(String sessionKey, int otacStage) {
-        this.sessionKey = sessionKey;
-        this.otacStage = otacStage;
+    private final IPair<String, Integer> pair;
+
+    SessionKeyPackage(String sessionKey, int otacLevel) {
+        pair = new GenericImmutablePair<>(sessionKey, otacLevel);
     }
 
     public String getSessionKey() {
-        return sessionKey;
+        return pair.getFirst();
     }
 
-    public int getOtacStage() {
-        return otacStage;
-    }
-
-    public String toString() {
-        StringBuilder r = new StringBuilder();
-        r.append("[").append(getSessionKey()).append(",");
-        if (getOtacStage() == 0) {
-            r.append("no otac");
-        } else if (getOtacStage() == 1) {
-            r.append("otac authenticated");
-        }
-        r.append("]");
-        return r.toString();
+    public int getOtacLevel() {
+        return pair.getSecond();
     }
 }
