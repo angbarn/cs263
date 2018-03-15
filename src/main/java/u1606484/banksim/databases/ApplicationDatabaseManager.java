@@ -43,21 +43,11 @@ public class ApplicationDatabaseManager extends DatabaseManager {
         };
         ResultSet keyResult = exec(retrievalQuery, retrievalBindings, true);
 
-        SessionKeyPackage sessionKey = null;
-
-        try {
-            keyResult.next();
-            if (!keyResult.isClosed()) {
-                String key = keyResult.getString(1);
-                int authenticationStage = keyResult.getInt(2);
-
-                sessionKey = new SessionKeyPackage(key, authenticationStage);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        return Optional.ofNullable(sessionKey);
+        return FunctionalHelpers.attemptSingleRetrieval(keyResult, r -> {
+            String key = keyResult.getString(1);
+            int authenticationStage = keyResult.getInt(2);
+            return new SessionKeyPackage(key, authenticationStage);
+        });
     }
 
     public Optional<UserAuthenticationPackage> getUserData(String sessionKey) {
@@ -71,21 +61,11 @@ public class ApplicationDatabaseManager extends DatabaseManager {
         };
         ResultSet idResult = exec(retrievalQuery, retrievalBindings, true);
 
-        UserAuthenticationPackage data = null;
-
-        try {
-            idResult.next();
-            if (!idResult.isClosed()) {
-                int userId = idResult.getInt(1);
-                int userOtac = idResult.getInt(2);
-
-                data = new UserAuthenticationPackage(userId, userOtac);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        return Optional.ofNullable(data);
+        return FunctionalHelpers.attemptSingleRetrieval(idResult, r -> {
+            int userId = r.getInt(1);
+            int userOtac = r.getInt(2);
+            return new UserAuthenticationPackage(userId, userOtac);
+        });
     }
 
     public void assignSessionKey(int userId, String sessionKey,
@@ -294,16 +274,7 @@ public class ApplicationDatabaseManager extends DatabaseManager {
                 new bInteger(1, userId)};
         ResultSet rs = exec(retrievalQuery, retrievalBindings, true);
 
-        try {
-            rs.next();
-            if (!rs.isClosed()) {
-                return Optional.of(rs.getBytes(1));
-            } else {
-                return Optional.empty();
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        return FunctionalHelpers.attemptSingleRetrieval(rs, r -> r.getBytes(1));
     }
 
     public Optional<String> fetchPhoneNumber(int userId) {
@@ -315,15 +286,7 @@ public class ApplicationDatabaseManager extends DatabaseManager {
                 new bInteger(1, userId)};
         ResultSet rs = exec(retrievalQuery, retrievalBindings, true);
 
-        try {
-            rs.next();
-            if (!rs.isClosed()) {
-                return Optional.of(rs.getString(1));
-            } else {
-                return Optional.empty();
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        return FunctionalHelpers
+                .attemptSingleRetrieval(rs, r -> r.getString(1));
     }
 }

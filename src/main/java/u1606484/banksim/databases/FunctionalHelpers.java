@@ -1,8 +1,10 @@
 package u1606484.banksim.databases;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -29,6 +31,19 @@ class FunctionalHelpers {
             Consumer<PreparedStatement>>> BIND_LONG = (i) -> (v) ->
             UncheckedConsumer
                     .escapeConsumer((s) -> s.setLong(i, v));
+
+    static <T> Optional<T> attemptSingleRetrieval(ResultSet rs,
+            UncheckedFunction<ResultSet, T> handler) {
+        try {
+            if (rs.next()) {
+                return Optional.of(handler.apply(rs));
+            } else {
+                return Optional.empty();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * A consumer whose accept method is marked as throwing a {@link
