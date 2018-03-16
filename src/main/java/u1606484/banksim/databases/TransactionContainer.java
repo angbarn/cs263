@@ -5,8 +5,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import u1606484.banksim.databases.FunctionalHelpers.DatabaseBinding;
+import u1606484.banksim.databases.FunctionalHelpers.UncheckedConsumer;
 
 class TransactionContainer {
 
@@ -36,6 +40,19 @@ class TransactionContainer {
         this.size = queryStrings.length;
     }
 
+    void close(List<Optional<ResultSet>> rs) {
+        rs.stream()
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .forEach(UncheckedConsumer.escapeConsumer(ResultSet::close));
+
+        try {
+            conn.commit();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * Binds an array of {@link DatabaseBinding} to a {@link PreparedStatement}
      * created from given {@code queryString}.
@@ -44,7 +61,7 @@ class TransactionContainer {
      * @param bindings The bindings for the query
      * @return The result of the single query
      */
-    private ResultSet executeSingle(String queryString,
+    private Optional<ResultSet> executeSingle(String queryString,
             DatabaseBinding[] bindings, boolean results) {
         try {
             PreparedStatement statement = conn.prepareStatement(queryString);
@@ -54,10 +71,10 @@ class TransactionContainer {
 
             // Behave differently if results are required or not
             if (results) {
-                return statement.executeQuery();
+                return Optional.of(statement.executeQuery());
             } else {
                 statement.executeUpdate();
-                return null;
+                return Optional.empty();
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -70,16 +87,16 @@ class TransactionContainer {
      *
      * @return Result of running queries on the database.
      */
-    ResultSet[] executeTransaction() {
+    List<Optional<ResultSet>> executeTransaction() {
         try {
-            ResultSet[] results = new ResultSet[size];
+            List<Optional<ResultSet>> results = new ArrayList<>();
             for (int i = 0; i < size; i++) {
                 String queryString = queryStrings[i];
                 DatabaseBinding[] bindingSet = bindings[i];
                 boolean resultsRequired = resultsRequiredFlags[i];
 
-                results[i] = executeSingle(queryString, bindingSet,
-                        resultsRequired);
+                results.add(executeSingle(queryString, bindingSet,
+                        resultsRequired));
             }
 
             conn.commit();

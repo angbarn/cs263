@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="utf-8">
-    <title>Login to Wondough</title>
+    <title>Please provide one-time password</title>
     <link rel="stylesheet" href="main.css">
   </head>
 
@@ -18,15 +18,14 @@
         </div>
         <form class="login-form" method="post" action="">
           <!--suppress HtmlUnknownAttribute -->
-          <input th:style="${box_styling}" type="text" name="username"
-                 placeholder="Account ID"/>
+          <input th:style="${box_styling}" type="text" name="otac"
+                 placeholder="One-time password"/>
           <!--suppress HtmlUnknownAttribute -->
-          <input th:style="${box_styling}" type="password" name="password"
-                 placeholder="Password"/>
+          <input type="hidden" name="username" th:value="${username}"
+                 placeholder="One-time password"/>
           <input type="submit">
         </form>
       </div>
     </div>
   </body>
-
 </html>

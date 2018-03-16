@@ -8,20 +8,16 @@ public class Base64Controller {
         return toBase64(data.getBytes());
     }
 
-    public static String toBase64(byte[] data) {
+    private static String toBase64(byte[] data) {
         return new String(Base64.getEncoder().encode(data));
     }
 
-    public static byte[] fromBase64(byte[] data) {
+    private static byte[] fromBase64(byte[] data) {
         return Base64.getDecoder().decode(data);
     }
 
     public static byte[] fromBase64(String data) {
         return fromBase64(data.getBytes());
-    }
-
-    public static String bytesToRawString(byte[] data) {
-        return new String(data);
     }
 
     public static String toHex(byte[] secretKey) {

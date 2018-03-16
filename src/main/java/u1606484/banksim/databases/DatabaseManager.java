@@ -26,16 +26,16 @@ class DatabaseManager {
         }
     }
 
-    Connection getConnection() {
-        return conn;
-    }
-
-    void commit() {
+    private void commit() {
         try {
             conn.commit();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    Connection getConnection() {
+        return conn;
     }
 
     ResultSet exec(String query, DatabaseBinding[] bindings,
@@ -49,6 +49,8 @@ class DatabaseManager {
                 return runQuery.executeQuery();
             } else {
                 runQuery.executeUpdate();
+                runQuery.close();
+                commit();
                 return null;
             }
         } catch (SQLException e) {
