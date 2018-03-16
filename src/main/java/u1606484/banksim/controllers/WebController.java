@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
+import u1606484.banksim.SecurityService;
 import u1606484.banksim.databases.UserAuthenticationPackage;
 import u1606484.banksim.weblogic.LoginSystem;
 
@@ -157,12 +158,12 @@ public class WebController {
 
         Supplier<ModelAndView> redirect = () -> {
             try {
-                response.sendRedirect("");
+                response.sendRedirect("/");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
 
-            return new ModelAndView("");
+            return new ModelAndView("index");
         };
 
         // Reject if already logged in
@@ -173,6 +174,11 @@ public class WebController {
 
         // Reject if passwords do not match
         if (!password1.equals(password2)) {
+            return redirect.get();
+        }
+
+        // Reject if passwords are too short
+        if (password1.length() < SecurityService.MINIMUM_PASSWORD_LENGTH) {
             return redirect.get();
         }
 
