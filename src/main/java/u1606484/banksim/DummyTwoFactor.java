@@ -20,22 +20,23 @@ public class DummyTwoFactor implements ITwoFactorService {
     }
 
     /**
-     * Transmits the provided OTAC to the provided address.
+     * Transmits the provided content to the provided address.
      *
-     * @param contactAddress The phone number / email / etc. to use to transmite
+     * @param contactAddress The phone number / email / etc. to use to transmit
      * the OTAC
-     * @param otac The OTAC to transmit
+     * @param content The content to transmit
      */
     @Override
-    public void sendTwoFactorCode(String contactAddress, String otac) {
+    public void sendMessage(String contactAddress, String content) {
         ClassLoader classLoader = getClass().getClassLoader();
         URL filePath = Optional.ofNullable(classLoader.getResource(FILE_NAME))
                 .orElseThrow(
                         () -> new IllegalStateException("Out file not found"));
 
         try (FileWriter f = new FileWriter(new File(filePath.getFile()))) {
-            f.write("Send to " + contactAddress + ":\n" + otac);
-            System.out.println("Write to " + filePath.getPath() + "->" + otac);
+            f.write("Send to " + contactAddress + ":\n" + content);
+            System.out
+                    .println("Write to " + filePath.getPath() + "->" + content);
         } catch (IOException e) {
             e.printStackTrace();
         }

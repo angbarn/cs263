@@ -103,7 +103,11 @@ public class LoginSystem {
         Optional<String> phoneNumber = databaseManager.fetchPhoneNumber(userId);
         if (phoneNumber.isPresent()) {
             String otac = generateOtac(userId);
-            twoFactorService.sendTwoFactorCode(phoneNumber.get(), otac);
+            String message =
+                    "NEVER share this code with anybody - not even Wondough "
+                            + "Staff."
+                            + "\nPlease use the code " + otac + " to log in.";
+            twoFactorService.sendMessage(phoneNumber.get(), otac);
         }
     }
 
@@ -173,5 +177,20 @@ public class LoginSystem {
 
     public void terminateSessions(int userId) {
         databaseManager.invalidateSessionKeys(userId);
+    }
+
+    public int createUser(String firstName, String lastName,
+            String phoneNumber, String addressLine1, String addressLine2,
+            String postcode, String county, String password1) {
+        return databaseManager
+                .newCustomer(phoneNumber, firstName, lastName, password1,
+                        SecurityService.PASSWORD_HASH_PASSES, addressLine1,
+                        addressLine2, postcode, county);
+    }
+
+    public void sendAccountId(String address, int newUserId) {
+        twoFactorService.sendMessage(address,
+                "Welcome to Wondough! Your new account number is " + newUserId
+                        + ". Please use this to log in.");
     }
 }

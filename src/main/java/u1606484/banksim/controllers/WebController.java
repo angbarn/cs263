@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.function.Supplier;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -131,6 +132,57 @@ public class WebController {
         }
 
         return "You are now logged out";
+    }
+
+    @RequestMapping(
+            value = "register",
+            method = {RequestMethod.GET, RequestMethod.POST}
+    )
+    @ResponseBody
+    public ModelAndView register() {
+        return new ModelAndView("register");
+    }
+
+    @RequestMapping(
+            value = "register_submit",
+            method = {RequestMethod.POST}
+    )
+    @ResponseBody
+    public ModelAndView registerSubmit(String firstName, String lastName,
+            String phoneNumber, String addressLine1, String addressLine2,
+            String postcode, String county, String password1, String password2,
+            @CookieValue(value = "session_token", defaultValue = "") String
+                    sessionKey,
+            HttpServletResponse response) {
+
+        Supplier<ModelAndView> redirect = () -> {
+            try {
+                response.sendRedirect("");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            return new ModelAndView("");
+        };
+
+        // Reject if already logged in
+        if (!sessionKey.equals("") && loginSystem.getUserFromSession(sessionKey)
+                .isPresent()) {
+            return redirect.get();
+        }
+
+        // Reject if passwords do not match
+        if (!password1.equals(password2)) {
+            return redirect.get();
+        }
+
+        // Otherwise, create user
+        int newUserId = loginSystem
+                .createUser(firstName, lastName, phoneNumber, addressLine1,
+                        addressLine2, postcode, county, password1);
+        loginSystem.sendAccountId(phoneNumber, newUserId);
+
+        return redirect.get();
     }
 
     /*
