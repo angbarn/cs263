@@ -20,9 +20,9 @@ public class WebController {
 
     private static final String FAIL_BOX_STYLING
             = "box-shadow: 5px 5px 20px #f00;";
-    private static final String LOGIN_ONE = "/index";
-    private static final String LOGIN_TWO = "/login2";
-    private static final String SUCCESS = "/success";
+    private static final String LOGIN_ONE = "index";
+    private static final String LOGIN_TWO = "login2";
+    private static final String SUCCESS = "success";
 
     private final LoginSystem loginSystem = new LoginSystem();
 
@@ -36,7 +36,7 @@ public class WebController {
     }
 
     @RequestMapping(
-            value = {"/", "/index"},
+            value = {"", "index"},
             method = {RequestMethod.POST, RequestMethod.GET}
     )
     @ResponseBody
