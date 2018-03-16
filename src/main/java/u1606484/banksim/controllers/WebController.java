@@ -36,7 +36,7 @@ public class WebController {
     }
 
     @RequestMapping(
-            value = "/",
+            value = {"/", "/index"},
             method = {RequestMethod.POST, RequestMethod.GET}
     )
     @ResponseBody
