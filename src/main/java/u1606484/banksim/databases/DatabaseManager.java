@@ -26,7 +26,7 @@ class DatabaseManager {
         }
     }
 
-    void commit() {
+    private void commit() {
         try {
             conn.commit();
         } catch (SQLException e) {

@@ -1,7 +1,14 @@
 package u1606484.banksim.weblogic;
 
+import java.util.Optional;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import u1606484.banksim.DummyTwoFactor;
+import u1606484.banksim.SecurityService;
 import u1606484.banksim.databases.ApplicationDatabaseManager;
+import u1606484.banksim.databases.PasswordData;
+import u1606484.banksim.databases.SessionKeyPackage;
+import u1606484.banksim.databases.UserAuthenticationPackage;
 import u1606484.banksim.interfaces.ITwoFactorService;
 
 public class LoginSystem {
@@ -33,6 +40,7 @@ public class LoginSystem {
                 OTAC_STEP_WINDOW);
     }
 
+    /*
     public static void main(String[] arguments) {
         LoginSystem l = new LoginSystem();
 
@@ -52,43 +60,114 @@ public class LoginSystem {
             System.out.println("Rejected on password");
         }
     }
+    */
 
     private String generateOtac(int userId) {
-        byte[] otacKey = databaseManager.fetchLoginKey(userId);
-
-        return twoFactorService.generateOtac(otacKey);
+        Optional<byte[]> otacKey = databaseManager.fetchLoginKey(userId);
+        if (otacKey.isPresent()) {
+            return twoFactorService.generateOtac(otacKey.get());
+        } else {
+            return "";
+        }
     }
 
     private boolean verifyPassword(int userId, String passwordAttempt) {
-        return databaseManager.verifyPassword(userId, passwordAttempt);
+        Optional<PasswordData> data = databaseManager.getPasswordData(userId);
+        if (data.isPresent()) {
+            boolean success = SecurityService.verifyPassword(passwordAttempt,
+                    data.get().getPasswordSalt(), data.get().getPasswordHash(),
+                    data.get().getPasses());
+
+            // Update password if out of date
+            if (success && data.get().getPasses()
+                    < SecurityService.PASSWORD_HASH_PASSES) {
+                databaseManager.updatePassword(userId, passwordAttempt,
+                        SecurityService.getSalt(),
+                        SecurityService.PASSWORD_HASH_PASSES);
+            }
+
+            return success;
+        } else {
+            return false;
+        }
     }
 
     private boolean verifyOtac(int userId, String otacAttempt) {
-        byte[] secretKey = databaseManager.fetchLoginKey(userId);
-        return twoFactorService.verifyOtac(otacAttempt, secretKey);
+        Optional<byte[]> secretKey = databaseManager.fetchLoginKey(userId);
+        return secretKey
+                .filter(key -> twoFactorService.verifyOtac(otacAttempt, key))
+                .isPresent();
     }
 
     public void sendOtac(int userId) {
-        String phoneNumber = databaseManager.fetchPhoneNumber(userId);
-        String otac = generateOtac(userId);
-
-        twoFactorService.sendTwoFactorCode(phoneNumber, otac);
+        Optional<String> phoneNumber = databaseManager.fetchPhoneNumber(userId);
+        if (phoneNumber.isPresent()) {
+            String otac = generateOtac(userId);
+            twoFactorService.sendTwoFactorCode(phoneNumber.get(), otac);
+        }
     }
 
-    public boolean attemptBasicLogin(int accountId, String passwordAttempt) {
-        return verifyPassword(accountId, passwordAttempt);
+    private void signOut(int accountId) {
+        databaseManager.invalidateSessionKeys(accountId);
     }
 
-    public boolean attemptOtacLogin(int accountId, String passwordAttempt,
-            String otacAttempt) {
-        boolean stageOne = verifyPassword(accountId, passwordAttempt);
-        boolean stageTwo = verifyOtac(accountId, otacAttempt);
+    private void assignNewSessionToken(int accountId, String sessionKey,
+            long expiry, int otacLevel, HttpServletResponse response) {
+        databaseManager
+                .assignSessionKey(accountId, sessionKey, expiry, otacLevel);
 
-        System.out.println(
-                "Login with " + accountId + ", " + passwordAttempt + ", "
-                        + otacAttempt + ": " + stageOne + "|" + stageTwo);
-
-        return stageOne && stageTwo;
+        Cookie newCookie = new Cookie("session_token", sessionKey);
+        // Set security flags
+        newCookie.setHttpOnly(true);
+        // todo - re-add this once you deploy
+        //       newCookie.setSecure(true);
+        response.addCookie(newCookie);
     }
 
+    public boolean attemptBasicLogin(int accountId, String passwordAttempt,
+            HttpServletResponse response) {
+        boolean success = verifyPassword(accountId, passwordAttempt);
+        // Assign session key if correct
+        if (success) {
+            String sessionKey = SecurityService
+                    .generateSessionKey(SecurityService.SESSION_KEY_LENGTH);
+            long expiry = System.currentTimeMillis()
+                    + SecurityService.SESSION_EXPIRY_LENGTH;
+
+            assignNewSessionToken(accountId, sessionKey, expiry, 0, response);
+        }
+
+        return success;
+    }
+
+    public boolean attemptOtacLogin(int accountId, String otacAttempt,
+            HttpServletResponse response) {
+        boolean success = verifyOtac(accountId, otacAttempt);
+
+        // Update session key if correct
+        if (success) {
+            // Sign out of all other devices - we can only be signed in
+            // through the web interface in once place
+            signOut(accountId);
+
+            // If logged in successfully, assign a new, logged in session key
+            String newSessionKey = SecurityService
+                    .generateSessionKey(SecurityService.SESSION_KEY_LENGTH);
+            long newExpiry = System.currentTimeMillis()
+                    + SecurityService.SESSION_EXPIRY_LENGTH;
+            assignNewSessionToken(accountId, newSessionKey, newExpiry, 1,
+                    response);
+        }
+
+        return success;
+    }
+
+    public Optional<UserAuthenticationPackage> getUserFromSession(
+            String sessionKey) {
+        return databaseManager.getUserData(sessionKey);
+    }
+
+    public Optional<SessionKeyPackage> getSessionFromUser(int userId) {
+        return databaseManager.getSessionKeyData(userId);
+    }
 }

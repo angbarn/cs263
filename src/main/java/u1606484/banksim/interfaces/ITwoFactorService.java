@@ -1,7 +1,5 @@
 package u1606484.banksim.interfaces;
 
-import java.util.stream.Stream;
-
 public interface ITwoFactorService {
 
     /**
@@ -22,12 +20,23 @@ public interface ITwoFactorService {
     int getWindowSize();
 
     default boolean verifyOtac(String attempt, byte[] secretKey) {
-        return Stream
-                .iterate(0, x -> x - 1)
-                .limit(getWindowSize())
-                .map(i -> generateOtac(secretKey, i))
-                .map(attempt::equals)
-                .reduce((aBoolean, aBoolean2) -> aBoolean || aBoolean2)
-                .orElse(false);
+        for (int i = 0; i > -getWindowSize(); i--) {
+            String correctOtac = generateOtac(secretKey, i);
+            System.out.println(correctOtac + " vs " + attempt);
+            if (attempt.equals(correctOtac)) {
+                return true;
+            }
+        }
+        return false;
+
+//        return Stream
+//                .iterate(0, x -> x - 1)
+//                .limit(getWindowSize())
+//                .map(i -> generateOtac(secretKey, i))
+//                .peek(otac -> System.out
+//                        .println("Otac test: " + attempt + " vs " + otac))
+//                .map(attempt::equals)
+//                .reduce((aBoolean, aBoolean2) -> aBoolean || aBoolean2)
+//                .orElse(false);
     }
 }
