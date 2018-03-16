@@ -119,8 +119,7 @@ public class LoginSystem {
         Cookie newCookie = new Cookie("session_token", sessionKey);
         // Set security flags
         newCookie.setHttpOnly(true);
-        // todo - re-add this once you deploy
-        //       newCookie.setSecure(true);
+        newCookie.setSecure(true);
         response.addCookie(newCookie);
     }
 
