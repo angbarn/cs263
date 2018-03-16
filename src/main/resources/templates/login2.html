@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="utf-8">
     <title>Please provide one-time password</title>
@@ -17,7 +17,11 @@
           </div>
         </div>
         <form class="login-form" method="post" action="">
-          <input type="text" name="otac"
+          <!--suppress HtmlUnknownAttribute -->
+          <input th:style="${box_styling}" type="text" name="otac"
+                 placeholder="One-time password"/>
+          <!--suppress HtmlUnknownAttribute -->
+          <input type="hidden" name="username" th:value="${username}"
                  placeholder="One-time password"/>
           <input type="submit">
         </form>
