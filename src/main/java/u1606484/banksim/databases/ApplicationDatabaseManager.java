@@ -54,7 +54,7 @@ public class ApplicationDatabaseManager extends DatabaseManager {
                 + "FROM session "
                 + "WHERE expiry > ? AND session_key = ?";
         DatabaseBinding[] retrievalBindings = new DatabaseBinding[]{
-                new bLong(1, System.currentTimeMillis() / 2),
+                new bLong(1, System.currentTimeMillis()),
                 new bString(2, sessionKey)
         };
         ResultSet idResult = exec(retrievalQuery, retrievalBindings, true);
@@ -66,31 +66,45 @@ public class ApplicationDatabaseManager extends DatabaseManager {
         });
     }
 
+    public void invalidateSessionKeys(int userId) {
+        String updateQuery = ""
+                + "UPDATE session "
+                + "SET expiry = ? "
+                + "WHERE customer_id = ?";
+        DatabaseBinding[] updateBindings = new DatabaseBinding[]{
+                new bLong(1, System.currentTimeMillis() - 1),
+                new bInteger(2, userId)
+        };
+
+        exec(updateQuery, updateBindings, false);
+    }
+
+    public void updateSessionKeyToken(int userId, String newSessionKey) {
+        String updateQuery = ""
+                + "UPDATE session "
+                + "SET session_key = ? "
+                + "WHERE customer_id = ?";
+        DatabaseBinding[] updateBindings = new DatabaseBinding[]{
+                new bString(1, newSessionKey),
+                new bInteger(2, userId)
+        };
+
+        exec(updateQuery, updateBindings, false);
+    }
+
     public void assignSessionKey(int userId, String sessionKey,
-            long expiry) {
-        if (getSessionKeyData(userId).isPresent()) {
-            String updateQuery = ""
-                    + "UPDATE session "
-                    + "SET session_key = ?, expiry = ? "
-                    + "WHERE customer_id = ?";
-            DatabaseBinding[] updateBindings = new DatabaseBinding[]{
-                    new bString(1, sessionKey),
-                    new bLong(2, expiry),
-                    new bInteger(3, userId)};
+            long expiry, int otacLevel) {
+        String insertionQuery = ""
+                + "INSERT INTO session "
+                + "(session_key, customer_id, expiry, otac_authenticated) "
+                + "VALUES (?, ?, ?, ?)";
+        DatabaseBinding[] insertionBindings = new DatabaseBinding[]{
+                new bString(1, sessionKey),
+                new bInteger(2, userId),
+                new bLong(3, expiry),
+                new bInteger(4, otacLevel)};
 
-            exec(updateQuery, updateBindings, false);
-        } else {
-            String insertionQuery = ""
-                    + "INSERT INTO session "
-                    + "(session_key, customer_id, expiry) "
-                    + "VALUES (?, ?, ?)";
-            DatabaseBinding[] insertionBindings = new DatabaseBinding[]{
-                    new bString(1, sessionKey),
-                    new bInteger(2, userId),
-                    new bLong(3, expiry)};
-
-            exec(insertionQuery, insertionBindings, false);
-        }
+        exec(insertionQuery, insertionBindings, false);
     }
 
     public void setOtacAuthenticated(String sessionKey, int otacStage) {
