@@ -1,5 +1,6 @@
 package u1606484.banksim.controllers;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -105,6 +106,31 @@ public class WebController {
         model.put("username", Integer.toString(userId));
 
         return new ModelAndView(view, model);
+    }
+
+    @RequestMapping(
+            value = "logout",
+            method = {RequestMethod.GET, RequestMethod.POST}
+    )
+    @ResponseBody
+    public String logout(
+            @CookieValue(value = "session_token", defaultValue = "") String
+                    sessionToken, HttpServletResponse response) {
+        Optional<UserAuthenticationPackage> user = loginSystem
+                .getUserFromSession(sessionToken);
+
+        // Can only log somebody out if we're sure they're the person logged in
+        if (user.isPresent() && user.get().getOtacLevel() == 1) {
+            loginSystem.terminateSessions(user.get().getUserId());
+        }
+
+        try {
+            response.sendRedirect("index");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return "You are now logged out";
     }
 
     /*

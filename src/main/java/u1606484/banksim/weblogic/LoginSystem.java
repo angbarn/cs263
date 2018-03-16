@@ -170,4 +170,8 @@ public class LoginSystem {
     public Optional<SessionKeyPackage> getSessionFromUser(int userId) {
         return databaseManager.getSessionKeyData(userId);
     }
+
+    public void terminateSessions(int userId) {
+        databaseManager.invalidateSessionKeys(userId);
+    }
 }
