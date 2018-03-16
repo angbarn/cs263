@@ -9,7 +9,7 @@ public interface ITwoFactorService {
      * the OTAC
      * @param otac The OTAC to transmit
      */
-    void sendTwoFactorCode(String contactAddress, String otac);
+    void sendMessage(String contactAddress, String otac);
 
     String generateOtac(byte[] secretKey, int offset);
 

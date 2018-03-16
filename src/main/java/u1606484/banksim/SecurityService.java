@@ -13,6 +13,7 @@ public class SecurityService {
     public static final int SESSION_KEY_LENGTH = 15;
     public static final int SESSION_EXPIRY_LENGTH = 30 * 1000;
     public static final int PASSWORD_HASH_PASSES = 1;
+    public static final int MINIMUM_PASSWORD_LENGTH = 16;
 
     static byte[] getSalt(int byteCount) {
         byte[] bytes = new byte[byteCount];

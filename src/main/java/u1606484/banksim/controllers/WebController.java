@@ -1,9 +1,11 @@
 package u1606484.banksim.controllers;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.function.Supplier;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
+import u1606484.banksim.SecurityService;
 import u1606484.banksim.databases.UserAuthenticationPackage;
 import u1606484.banksim.weblogic.LoginSystem;
 
@@ -105,6 +108,87 @@ public class WebController {
         model.put("username", Integer.toString(userId));
 
         return new ModelAndView(view, model);
+    }
+
+    @RequestMapping(
+            value = "logout",
+            method = {RequestMethod.GET, RequestMethod.POST}
+    )
+    @ResponseBody
+    public String logout(
+            @CookieValue(value = "session_token", defaultValue = "") String
+                    sessionToken, HttpServletResponse response) {
+        Optional<UserAuthenticationPackage> user = loginSystem
+                .getUserFromSession(sessionToken);
+
+        // Can only log somebody out if we're sure they're the person logged in
+        if (user.isPresent() && user.get().getOtacLevel() == 1) {
+            loginSystem.terminateSessions(user.get().getUserId());
+        }
+
+        try {
+            response.sendRedirect("index");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return "You are now logged out";
+    }
+
+    @RequestMapping(
+            value = "register",
+            method = {RequestMethod.GET, RequestMethod.POST}
+    )
+    @ResponseBody
+    public ModelAndView register() {
+        return new ModelAndView("register");
+    }
+
+    @RequestMapping(
+            value = "register_submit",
+            method = {RequestMethod.POST}
+    )
+    @ResponseBody
+    public ModelAndView registerSubmit(String firstName, String lastName,
+            String phoneNumber, String addressLine1, String addressLine2,
+            String postcode, String county, String password1, String password2,
+            @CookieValue(value = "session_token", defaultValue = "") String
+                    sessionKey,
+            HttpServletResponse response) {
+
+        Supplier<ModelAndView> redirect = () -> {
+            try {
+                response.sendRedirect("/");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            return new ModelAndView("index");
+        };
+
+        // Reject if already logged in
+        if (!sessionKey.equals("") && loginSystem.getUserFromSession(sessionKey)
+                .isPresent()) {
+            return redirect.get();
+        }
+
+        // Reject if passwords do not match
+        if (!password1.equals(password2)) {
+            return redirect.get();
+        }
+
+        // Reject if passwords are too short
+        if (password1.length() < SecurityService.MINIMUM_PASSWORD_LENGTH) {
+            return redirect.get();
+        }
+
+        // Otherwise, create user
+        int newUserId = loginSystem
+                .createUser(firstName, lastName, phoneNumber, addressLine1,
+                        addressLine2, postcode, county, password1);
+        loginSystem.sendAccountId(phoneNumber, newUserId);
+
+        return redirect.get();
     }
 
     /*
