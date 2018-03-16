@@ -13,8 +13,8 @@ class DatabaseManager {
     /**
      * Location of the database file on disk.
      */
-    private static final String DATABASE_URL = "jdbc:sqlite:C:/Users/angus"
-            + "/Documents/year2_local/cs263/cs263/src/main/sql/accounts.db";
+    private static final String DATABASE_URL = "jdbc:sqlite::resource"
+            + ":accounts.db";
     private final Connection conn;
 
     DatabaseManager() {

@@ -7,9 +7,7 @@ import u1606484.banksim.interfaces.ITwoFactorService;
 
 public class DummyTwoFactor implements ITwoFactorService {
 
-    private static final String FILE_LOCATION =
-            "C:\\Users\\angus\\Documents\\year2_local\\cs263\\cs263"
-                    + "\\dummySend.txt";
+    private static final String FILE_NAME = "dummySend.txt";
     private final IOtacGenerator generator;
     private final int otacStepWindow;
 
@@ -27,7 +25,8 @@ public class DummyTwoFactor implements ITwoFactorService {
      */
     @Override
     public void sendTwoFactorCode(String contactAddress, String otac) {
-        try (FileWriter f = new FileWriter(FILE_LOCATION)) {
+        try (FileWriter f = new FileWriter(
+                this.getClass().getResource(FILE_NAME).getPath())) {
             f.write("Send to " + contactAddress + ":\n" + otac);
         } catch (IOException e) {
             e.printStackTrace();
