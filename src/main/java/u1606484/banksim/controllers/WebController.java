@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Supplier;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
+import u1606484.banksim.LogMessages;
 import u1606484.banksim.SecurityService;
 import u1606484.banksim.databases.UserAuthenticationPackage;
 import u1606484.banksim.weblogic.LoginSystem;
@@ -54,7 +56,7 @@ public class WebController {
                     String otac,
             @CookieValue(value = "session_token", defaultValue = "") String
                     sessionKey,
-            HttpServletResponse response) {
+            HttpServletRequest request, HttpServletResponse response) {
 
         // Style input boxes if there is an error
         Map<String, String> model = new HashMap<>();
@@ -67,6 +69,9 @@ public class WebController {
         int userId;
         boolean success;
         String view;
+        String ip;
+
+        ip = request.getRemoteAddr();
 
         System.out.println(sessionKey + " - " + keyLevel);
 
@@ -77,6 +82,10 @@ public class WebController {
             // Send OTAC if we succeed
             if (success) {
                 loginSystem.sendOtac(userId);
+                loginSystem
+                        .writeLog(LogMessages.SUCCEED_LOGIN_1.get(userId, ip));
+            } else {
+                loginSystem.writeLog(LogMessages.FAIL_LOGIN_1.get(userId, ip));
             }
 
             // Set view as appropriate
@@ -86,8 +95,12 @@ public class WebController {
             success = loginSystem.attemptOtacLogin(userId, otac, response);
 
             // Re-send OTAC if we fail
-            if (!success) {
+            if (success) {
+                loginSystem
+                        .writeLog(LogMessages.SUCCEED_LOGIN_2.get(userId, ip));
+            } else {
                 loginSystem.sendOtac(userId);
+                loginSystem.writeLog(LogMessages.FAIL_LOGIN_2.get(userId, ip));
             }
 
             view = success ? SUCCESS : LOGIN_TWO;
@@ -117,13 +130,17 @@ public class WebController {
     @ResponseBody
     public String logout(
             @CookieValue(value = "session_token", defaultValue = "") String
-                    sessionToken, HttpServletResponse response) {
+                    sessionToken,
+            HttpServletRequest request, HttpServletResponse response) {
         Optional<UserAuthenticationPackage> user = loginSystem
                 .getUserFromSession(sessionToken);
 
         // Can only log somebody out if we're sure they're the person logged in
         if (user.isPresent() && user.get().getOtacLevel() == 1) {
-            loginSystem.terminateSessions(user.get().getUserId());
+            int userId = user.get().getUserId();
+            loginSystem.terminateSessions(userId);
+            loginSystem.writeLog(
+                    LogMessages.LOGOUT.get(userId, request.getRemoteAddr()));
         }
 
         try {

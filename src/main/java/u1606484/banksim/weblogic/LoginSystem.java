@@ -3,6 +3,7 @@ package u1606484.banksim.weblogic;
 import java.util.Optional;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import u1606484.banksim.AesEncryption;
 import u1606484.banksim.SecurityService;
 import u1606484.banksim.TwoFactorService;
 import u1606484.banksim.databases.ApplicationDatabaseManager;
@@ -38,6 +39,14 @@ public class LoginSystem {
                 OTAC_LENGTH,
                 OTAC_STEP,
                 OTAC_STEP_WINDOW);
+    }
+
+    public void writeLog(String content) {
+        byte[] encyptedContent = AesEncryption.encrypt(content.getBytes(),
+                System.getenv("log_encryption_key"));
+        long timestamp = System.currentTimeMillis();
+
+        databaseManager.newLog(timestamp, encyptedContent);
     }
 
     /*

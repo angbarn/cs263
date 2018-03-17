@@ -233,6 +233,33 @@ public class ApplicationDatabaseManager extends DatabaseManager {
         return newId;
     }
 
+    public int newLog(long creationDate, byte[] content) {
+        DatabaseBinding[] insertionBindings = new DatabaseBinding[]{
+                new bLong(1, creationDate),
+                new bBytes(2, content)};
+        String insertionQuery = ""
+                + "INSERT INTO log "
+                + "(time_created, content) "
+                + "VALUES (?, ?)";
+        String retrieveIdQuery = "SELECT last_insert_row_id()";
+
+        TransactionContainer transaction = new TransactionContainer(
+                getConnection(),
+                new String[]{insertionQuery, retrieveIdQuery},
+                new DatabaseBinding[][]{insertionBindings, {}},
+                new boolean[]{false, true});
+
+        List<Optional<ResultSet>> results = transaction.executeTransaction();
+
+        int newId = UncheckedFunction.<ResultSet, Integer>escapeFunction(
+                x -> x.getInt(1)).apply(results.get(1).orElseThrow(
+                () -> new IllegalStateException(
+                        "Failed to get last insert id")));
+        transaction.close(results);
+
+        return newId;
+    }
+
     public void updatePassword(int securityId, String passwordPlaintext,
             byte[] passwordSalt, int hashIterations) {
         byte[] newPassword = SecurityService
