@@ -8,6 +8,9 @@ import java.util.Optional;
 import u1606484.banksim.interfaces.IOtacGenerator;
 import u1606484.banksim.interfaces.ITwoFactorService;
 
+/**
+ * @deprecated Please use {@link TwoFactorService}
+ */
 public class DummyTwoFactor implements ITwoFactorService {
 
     private static final String FILE_NAME = "dummySend.txt";

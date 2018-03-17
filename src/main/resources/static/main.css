@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
   background-color: #3d3051;
   height: 100%;
   width: 100%;
@@ -8,7 +9,6 @@ html, body {
 .page {
   height: 100%;
   width: 100%;
-
   display: flex;
   justify-content: center;
   align-items: center;
@@ -22,34 +22,62 @@ html, body {
   text-align: center;
 }
 
+.baby-boy-logo {
+  text-shadow: 0px 0px 5px #fff;
+  text-align: right;
+}
+
+.baby-boy-logo img {
+  width: 64px;
+}
+
 .login-form {
-    width: 50%;
-    margin: auto;
-    display: inline-block;
+  width: 50%;
+  margin: auto;
+  display: inline-block;
 }
 
 .login-form input {
-    height: 20%;
-    margin: 20px 0px 20px 0px;
-    width: 100%;
-
-    font-family: "Verdana";
-    font-size: 24pt;
-
-    background-color: #3d3051;
-    border: none;
-    box-shadow: 5px 5px 20px #1f1238;
-    text-shadow: 0px 0px 5px #ffffff;
-    color: #ffffff;
-    padding: 20px;
+  height: 20%;
+  margin: 20px 0px 20px 0px;
+  width: 100%;
+  font-family: "Verdana";
+  font-size: 24pt;
+  background-color: #3d3051;
+  border: none;
+  box-shadow: 5px 5px 20px #1f1238;
+  text-shadow: 0px 0px 5px #ffffff;
+  color: #ffffff;
+  padding: 20px;
 }
 
-.login-form input[type=submit], .login-form input[type=hidden] {
-    visibility: hidden;
-    height: 0px;
-    width: 0px;
-    margin: 0px;
-    padding: 0px;
+.registration-form input {
+  height: 24pt;
+  margin: 5px;
+  width: 80%;
+  font-family: "Verdana";
+  font-size: 18pt;
+  background-color: #3d3051;
+  border: none;
+  box-shadow: 5px 5px 5px #1f1238;
+  text-shadow: 0px 0px 5px #ffffff;
+  color: #ffffff;
+  padding: 10px;
+  margin-left: 20px;
+}
+
+.registration-form div {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+form input[type=submit],
+form input[type=hidden] {
+  visibility: hidden;
+  height: 0px;
+  width: 0px;
+  margin: 0px;
+  padding: 0px;
 }
 
 .logo div {
@@ -61,8 +89,18 @@ html, body {
   width: 70%;
 }
 
+.logo-wondough:hover {
+  text-shadow: 0px 0px 25px;
+  transition-duration: 1s;
+}
+
 .logo-wondough {
   color: #fee2c1;
+}
+
+.logo-bank:hover {
+  text-shadow: 0px 0px 25px;
+  transition-duration: 1s;
 }
 
 .logo-bank {
@@ -80,7 +118,34 @@ html, body {
   justify-content: center;
   align-items: center;
   */
-
   display: flex;
   align-content: center;
+}
+
+.pullout {
+    top: -40px;
+    position: absolute;
+    background: rgba(77, 60, 102, 1);
+    box-shadow: 5px 5px 20px #1f1238;
+    padding: 8px;
+    color: #fff;
+    font-family: "Verdana";
+    font-weight: lighter;
+    text-shadow: 0px 0px 5px #fff;
+}
+
+.pullout:hover {
+    transition-duration: 0.5s;
+    top: 0px;
+    box-shadow: 5px 5px 60px #1f1238
+}
+
+.pullout p {
+    margin-top: 20px;
+    margin-bottom: 0px;
+}
+
+.pullout a {
+    color: #fff;
+    text-decoration: none;
 }
