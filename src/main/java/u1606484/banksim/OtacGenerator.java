@@ -46,14 +46,14 @@ class OtacGenerator implements IOtacGenerator {
                 .forEach(System.out::println);
 
         List<String> otacGeneration = bytesList.stream()
-                .map(bs -> g.generateOtac(bs, System.currentTimeMillis()))
+                .map(bs -> g.generateOtac(bs,
+                        g.getTimestamp(System.currentTimeMillis(), 0)))
                 .collect(Collectors.toList());
 
         otacGeneration.forEach(System.out::println);
     }
 
     private String getTimeString(long timeMillis) {
-
         StringBuilder t = new StringBuilder();
         t.append(Long.toHexString(timeMillis).toUpperCase());
         while (t.length() < 16) {
@@ -66,7 +66,7 @@ class OtacGenerator implements IOtacGenerator {
     @Override
     public long getTimestamp(long rawTimeMillis, int offset) {
         long timeMillis = (rawTimeMillis / windowSize);
-        timeMillis += offset * windowSize;
+        timeMillis += offset;
 
         return timeMillis;
     }
@@ -77,7 +77,8 @@ class OtacGenerator implements IOtacGenerator {
         String stringKey = Base64Controller.toHex(secretKey).toUpperCase();
         String stringCount = Integer.toString(digitCount);
 
-        System.out.println(stringKey);
+//        System.out.println(
+//                "OTAC -> " + stringTime + " " + stringKey + " " + stringCount);
 
         return TOTP.generateTOTP512(stringTime, stringKey, stringCount);
     }

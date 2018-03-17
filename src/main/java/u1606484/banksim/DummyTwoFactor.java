@@ -46,8 +46,8 @@ public class DummyTwoFactor implements ITwoFactorService {
     }
 
     @Override
-    public String generateOtac(byte[] secretKey, int offset) {
-        return generator.generateOtac(secretKey, offset);
+    public String generateOtac(byte[] secretKey, int timeMillis) {
+        return generator.generateOtac(secretKey, System.currentTimeMillis());
     }
 
     @Override

@@ -22,7 +22,7 @@ public interface ITwoFactorService {
     default boolean verifyOtac(String attempt, byte[] secretKey) {
         for (int i = 0; i > -getWindowSize(); i--) {
             String correctOtac = generateOtac(secretKey, i);
-            System.out.println(correctOtac + " vs " + attempt);
+//            System.out.println(correctOtac + " vs " + attempt);
             if (attempt.equals(correctOtac)) {
                 return true;
             }
