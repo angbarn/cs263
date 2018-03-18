@@ -1,7 +1,9 @@
-\documentclass{article}
+\documentclass[12pt]{article}
 
 \usepackage{graphicx} 
 \usepackage{titlepic}
+\usepackage[a4paper, margin=20mm]{geometry}
+\usepackage{enumitem}
 
 \title{
     CS263 Cybersecurity \\
@@ -12,15 +14,18 @@
 
 \begin{document}
 
-\maketitle
+    \maketitle
 
-\include{system_design}
-\include{implementation}
-\include{testing}
+    \newpage
 
-\cite{bbcPhone}
+    \twocolumn
 
-\bibliography{references}
-\bibliographystyle{plain}
+    \include{system_design}
+    \include{implementation}
+    \include{testing}
+
+
+    \bibliography{references}
+    \bibliographystyle{ieeetr}
 
 \end{document}
