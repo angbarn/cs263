@@ -108,7 +108,7 @@ There are a wide variety of possible attacks upon the proposed Wondough bank sys
 
 \subsubsection{Tampering}
 
-\begin{enumerate}
+\begin{enumerate}[resume]
     \item IT could change logs without permission
     \begin{enumerate}
         \item Hide other actions in system
@@ -135,7 +135,7 @@ There are a wide variety of possible attacks upon the proposed Wondough bank sys
 
 \subsubsection{Repudiation}
 
-\begin{enumerate}
+\begin{enumerate}[resume]
     \item The customer pretends to be the victim of fraud
     \begin{enumerate}
         \item The bank must cover assets lost by fraud
@@ -147,7 +147,7 @@ There are a wide variety of possible attacks upon the proposed Wondough bank sys
 
 \subsubsection{Information disclosure}
 
-\begin{enumerate}
+\begin{enumerate}[resume]
     \item Malicious access to a customer's account by member of customer support
 
     \item Malicious access to a customer's account by member of IT
@@ -181,3 +181,35 @@ There are a wide variety of possible attacks upon the proposed Wondough bank sys
     \item Different servers could validate data differently when sending data to be logged – if some paths give different results, an attacker could exploit this
     \item An attacker could bypass client-side validation and send un-validated information to a server
 \end{enumerate}
+
+\subsection{Threat solution and evaluation}
+
+
+
+\subsection{Legal and economic considerations}
+
+There are a number of other considerations which must be considered for the design of the Wondough banking system. While legal requirements are perhaps the most obvious, and regulations are effectively mandatory, economic constraints on the system must also be considered.
+
+\subsubsection{Legal requirements}
+
+
+
+\subsubsection{Economic constraints}
+
+A system which fully meets or exceeds all requirements may still be prohibitively expensive for a small scale, start-up company like Wondough Bank to deploy, and thus may be unrealistic. It is necessary to consider the compromises which have to be made when designing such a system. 
+
+\subsubsubsection{Hosting}
+
+Firstly, the choice of server host is important. While larger banks are able to afford their own dedicated servers for online banking, it may be necessary for a company on the scale of Wondough Bank to turn to a cloud-based hosting service such as Amazon Web Services or Microsoft Azure. While an in-house hosting solution may be cheaper in the long run, an organisation such as Wondough Bank may be unable to meet the necessary up-front expenditure.
+
+However, hosting Wondough Bank's web-app in the cloud has some key advantages. Firstly, while the organisation is currently small, their intended scope for expansion is large. This is an area in which cloud services excel, and Wondough would need only to pay for any increased usage. If Wondough Bank were to install their own hosting infrastructure, they may find future expansion or upgrades costly.
+
+Also, many hosts are willing to accept a large part of the responsibility for the security of data transmitted and stored on their servers. This means that Wondough Bank's resources may be focused more in other areas, and allows them to transfer risk to third parties. However, this may be disadvantageous, and Wondough Bank may want to be certain exactly what level of security data is afforded - a task which could be difficult when dealing with a large hosting company.
+
+\subsubsubsection{Key security}
+
+In the interests of security, Hardware Security Modules (HSMs) would be advantageous for any implementation of a secure system. Fortunately, many hosting services provide support for storing keys and passwords on HSMs.
+
+\subsubsubsection{Software}
+
+For an organisation such as Wondough Bank, software lisences may be expensive. For example, certain implementations of SQL can be highly-priced. However, similarly to HSMs, hosting services may offer a "pay-by-use" pricing system for such software, moving a single fixed cost to several smaller, variable ones.
