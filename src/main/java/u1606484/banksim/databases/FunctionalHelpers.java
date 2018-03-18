@@ -5,7 +5,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Optional;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -78,31 +77,6 @@ class FunctionalHelpers {
         }
 
         void accept(T t) throws SQLException;
-    }
-
-    /**
-     * A bi-consumer whose accept method is marked as throwing a {@link
-     * SQLException}, allowing lambda functions using SQL methods to be
-     * written.
-     *
-     * @param <T> The first type that the bi-consumer will accept
-     * @param <U> The second type that the bi-consumer will accept
-     */
-    @FunctionalInterface
-    interface UncheckedBiConsumer<T, U> {
-
-        static <T, U> BiConsumer<T, U> escapeBiConsumer(
-                UncheckedBiConsumer<T, U> c) {
-            return (t, u) -> {
-                try {
-                    c.accept(t, u);
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            };
-        }
-
-        void accept(T t, U u) throws SQLException;
     }
 
     @FunctionalInterface

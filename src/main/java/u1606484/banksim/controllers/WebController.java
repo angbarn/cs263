@@ -134,6 +134,7 @@ public class WebController {
         return new ModelAndView(view, model);
     }
 
+    @SuppressWarnings("SameReturnValue")
     @RequestMapping(
             value = "logout",
             method = {RequestMethod.GET, RequestMethod.POST}
@@ -218,65 +219,4 @@ public class WebController {
 
         return redirect.get();
     }
-
-    /*
-
-    @RequestMapping(
-            value = "/attempt_login",
-            method = RequestMethod.POST
-    )
-    @ResponseBody
-    public ModelAndView attemptLoginStage1(String username, String password,
-            Model model) {
-
-        int userId;
-        try {
-            userId = Integer.parseInt(username);
-        } catch (NumberFormatException e) {
-            model.addAttribute("box_styling", FAIL_BOX_STYLING);
-            return new ModelAndView("index", model.asMap());
-        }
-
-        boolean loginSuccess = loginSystem.attemptBasicLogin(userId, password);
-        if (loginSuccess) {
-            loginSystem.sendOtac(userId);
-            model.addAttribute("username", username);
-            model.addAttribute("password", password);
-            return new ModelAndView("login2", model.asMap());
-        } else {
-            model.addAttribute("box_styling", FAIL_BOX_STYLING);
-            return new ModelAndView("index", model.asMap());
-        }
-    }
-
-    @RequestMapping(
-            value = "attempt_login_2",
-            method = RequestMethod.POST
-    )
-    @ResponseBody
-    public ModelAndView attemptLoginStage2(String username, String password,
-            String otac, Model model) {
-
-        System.out.println("hello attempt 2");
-
-        int userId;
-        try {
-            userId = Integer.parseInt(username);
-        } catch (NumberFormatException e) {
-            model.addAttribute("box_styling", FAIL_BOX_STYLING);
-            return new ModelAndView("index", model.asMap());
-        }
-
-        boolean loginSuccess = loginSystem
-                .attemptOtacLogin(userId, password, otac);
-        if (loginSuccess) {
-            return new ModelAndView("success", model.asMap());
-        } else {
-            loginSystem.sendOtac(userId);
-            model.addAttribute("box_styling", FAIL_BOX_STYLING);
-            return new ModelAndView("login2", model.asMap());
-        }
-    }
-
-    */
 }

@@ -10,7 +10,6 @@ import u1606484.banksim.SecurityService;
 import u1606484.banksim.TwoFactorService;
 import u1606484.banksim.databases.ApplicationDatabaseManager;
 import u1606484.banksim.databases.PasswordData;
-import u1606484.banksim.databases.SessionKeyPackage;
 import u1606484.banksim.databases.UserAuthenticationPackage;
 import u1606484.banksim.interfaces.ITwoFactorService;
 
@@ -44,11 +43,11 @@ public class LoginSystem {
     }
 
     public void writeLog(String content) {
-        byte[] encyptedContent = AesEncryption.encrypt(content.getBytes(),
+        byte[] encryptedContent = AesEncryption.encrypt(content.getBytes(),
                 System.getenv("log_encryption_key"));
         long timestamp = System.currentTimeMillis();
 
-        databaseManager.newLog(timestamp, encyptedContent);
+        databaseManager.newLog(timestamp, encryptedContent);
     }
 
     /*
@@ -75,11 +74,7 @@ public class LoginSystem {
 
     private String generateOtac(int userId) {
         Optional<byte[]> otacKey = databaseManager.fetchLoginKey(userId);
-        if (otacKey.isPresent()) {
-            return twoFactorService.generateOtac(otacKey.get());
-        } else {
-            return "";
-        }
+        return otacKey.map(twoFactorService::generateOtac).orElse("");
     }
 
     private boolean verifyPassword(int userId, String passwordAttempt) {
@@ -112,14 +107,14 @@ public class LoginSystem {
 
     public void sendOtac(int userId) {
         Optional<String> phoneNumber = databaseManager.fetchPhoneNumber(userId);
-        if (phoneNumber.isPresent()) {
+        phoneNumber.ifPresent(s -> {
             String otac = generateOtac(userId);
             String message =
                     "NEVER share this code with anybody - not even Wondough "
                             + "Staff."
                             + "\nPlease use the code " + otac + " to log in.";
-            twoFactorService.sendMessage(phoneNumber.get(), otac);
-        }
+            twoFactorService.sendMessage(s, message);
+        });
     }
 
     private void signOut(int accountId) {
@@ -180,10 +175,6 @@ public class LoginSystem {
     public Optional<UserAuthenticationPackage> getUserFromSession(
             String sessionKey) {
         return databaseManager.getUserData(sessionKey);
-    }
-
-    public Optional<SessionKeyPackage> getSessionFromUser(int userId) {
-        return databaseManager.getSessionKeyData(userId);
     }
 
     public void terminateSessions(int userId) {

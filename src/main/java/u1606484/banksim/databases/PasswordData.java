@@ -2,22 +2,14 @@ package u1606484.banksim.databases;
 
 public class PasswordData {
 
-    private final int securityId;
     private final byte[] passwordHash;
     private final byte[] passwordSalt;
     private final int passes;
 
-    PasswordData(int securityId, byte[] passwordHash,
-            byte[] passwordSalt,
-            int passes) {
-        this.securityId = securityId;
+    PasswordData(byte[] passwordHash, byte[] passwordSalt, int passes) {
         this.passwordHash = passwordHash;
         this.passwordSalt = passwordSalt;
         this.passes = passes;
-    }
-
-    public int getSecurityId() {
-        return securityId;
     }
 
     public byte[] getPasswordHash() {

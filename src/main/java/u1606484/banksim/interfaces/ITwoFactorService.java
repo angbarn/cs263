@@ -5,7 +5,7 @@ public interface ITwoFactorService {
     /**
      * Transmits the provided OTAC to the provided address.
      *
-     * @param contactAddress The phone number / email / etc. to use to transmite
+     * @param contactAddress The phone number / email / etc. to use to transmit
      * the OTAC
      * @param otac The OTAC to transmit
      */

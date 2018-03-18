@@ -28,7 +28,7 @@ public class AesEncryption {
     /**
      * Algorithm to use for encryption/decryption
      */
-    private static final String ALGO = "AES";
+    private static final String ALGORITHM = "AES";
 
     /**
      * Length of key in bytes
@@ -43,19 +43,20 @@ public class AesEncryption {
      *
      * @param data The data to process
      * @param password The password to encrypt/decrypt with
-     * @param opmode Whether to encrypt or decrypt
+     * @param operation Whether to encrypt or decrypt
      */
-    private static byte[] swap(byte[] data, String password, int opmode) {
-        if (opmode != Cipher.DECRYPT_MODE && opmode != Cipher.ENCRYPT_MODE) {
+    private static byte[] swap(byte[] data, String password, int operation) {
+        if (operation != Cipher.DECRYPT_MODE
+                && operation != Cipher.ENCRYPT_MODE) {
             throw new IllegalArgumentException("Must encrypt or decrypt");
         }
 
         byte[] widthPassword = enforcePasswordLength(password);
-        Key key = new SecretKeySpec(widthPassword, 0, KEY_LENGTH, ALGO);
+        Key key = new SecretKeySpec(widthPassword, 0, KEY_LENGTH, ALGORITHM);
 
         try {
-            Cipher c = Cipher.getInstance(ALGO);
-            c.init(opmode, key);
+            Cipher c = Cipher.getInstance(ALGORITHM);
+            c.init(operation, key);
 
             // Do the business
             return c.doFinal(data);

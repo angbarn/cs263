@@ -122,19 +122,6 @@ public class ApplicationDatabaseManager extends DatabaseManager {
         exec(updateQuery, updateBindings, false);
     }
 
-    public void updateSessionKeyToken(int userId, String newSessionKey) {
-        String updateQuery = ""
-                + "UPDATE session "
-                + "SET session_key = ? "
-                + "WHERE customer_id = ?";
-        DatabaseBinding[] updateBindings = new DatabaseBinding[]{
-                new bString(1, newSessionKey),
-                new bInteger(2, userId)
-        };
-
-        exec(updateQuery, updateBindings, false);
-    }
-
     public void assignSessionKey(int userId, String sessionKey,
             long expiry, int otacLevel) {
         String insertionQuery = ""
@@ -207,7 +194,7 @@ public class ApplicationDatabaseManager extends DatabaseManager {
         return newId;
     }
 
-    public int newAddress(String addressLine1, String addressLine2,
+    private int newAddress(String addressLine1, String addressLine2,
             String postcode, String county) {
         String insertionQuery = ""
                 + "INSERT INTO address "
@@ -222,7 +209,7 @@ public class ApplicationDatabaseManager extends DatabaseManager {
         return newGenericDatabaseRecord(insertionQuery, insertionBindings);
     }
 
-    public int newSecurity(String passwordPlaintext,
+    private int newSecurity(String passwordPlaintext,
             int passwordHashPasses) {
         byte[] loginSalt = SecurityService.getSalt();
         byte[] supportInSalt = SecurityService.getSalt();
@@ -248,7 +235,7 @@ public class ApplicationDatabaseManager extends DatabaseManager {
         return newGenericDatabaseRecord(insertionQuery, insertionBindings);
     }
 
-    public int newLog(long creationDate, byte[] content) {
+    public void newLog(long creationDate, byte[] content) {
         DatabaseBinding[] insertionBindings = new DatabaseBinding[]{
                 new bLong(1, creationDate),
                 new bBytes(2, content)};
@@ -257,7 +244,7 @@ public class ApplicationDatabaseManager extends DatabaseManager {
                 + "(time_created, content) "
                 + "VALUES (?, ?)";
 
-        return newGenericDatabaseRecord(insertionQuery, insertionBindings);
+        newGenericDatabaseRecord(insertionQuery, insertionBindings);
     }
 
     public void updatePassword(int securityId, String passwordPlaintext,
@@ -293,12 +280,11 @@ public class ApplicationDatabaseManager extends DatabaseManager {
         ResultSet rs = exec(retrievalQuery, retrievalBindings, true);
 
         return FunctionalHelpers.attemptSingleRetrieval(rs, r -> {
-            int securityId = rs.getInt(1);
             byte[] password = rs.getBytes(2);
             byte[] salt = rs.getBytes(3);
             int passes = rs.getInt(4);
 
-            return new PasswordData(securityId, password, salt, passes);
+            return new PasswordData(password, salt, passes);
         });
     }
 

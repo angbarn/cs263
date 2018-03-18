@@ -12,11 +12,9 @@ public enum LogMessages {
     SUCCEED_LOGIN_2(
             "Account ID %s from %s OTAC authenticated successfully"),
     LOGOUT(
-            "Account ID %s from %s logged out"),
-    ERROR(
-            "[ERROR] caught exception - %s");
+            "Account ID %s from %s logged out");
 
-    private String messageStructure;
+    private final String messageStructure;
 
     LogMessages(String messageStructure) {
         this.messageStructure = messageStructure;
