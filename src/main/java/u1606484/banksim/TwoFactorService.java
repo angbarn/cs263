@@ -1,5 +1,9 @@
 package u1606484.banksim;
 
+import com.twilio.Twilio;
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.rest.api.v2010.account.MessageCreator;
+import com.twilio.type.PhoneNumber;
 import java.security.SecureRandom;
 import u1606484.banksim.interfaces.IOtacGenerator;
 import u1606484.banksim.interfaces.ITwoFactorService;
@@ -39,19 +43,15 @@ public class TwoFactorService implements ITwoFactorService {
      */
     @Override
     public void sendMessage(String contactAddress, String messageBody) {
-        System.out.println(contactAddress + ">>>>>" + messageBody);
-
-        /*
         Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
 
         MessageCreator messageCreator = Message.creator(
                 new PhoneNumber(contactAddress),
-                new PhoneNumber("+441429450286"),
+                new PhoneNumber(System.getenv("twilio_phone_number")),
                 messageBody);
 
         Message m = messageCreator.create();
         System.out.println(m.getBody());
-        */
     }
 
     @Override
