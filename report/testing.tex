@@ -1,26 +1,46 @@
 \section{Testing and evaluation}
 
-In the case of any application, testing for security is important. However, it is especially important for a security0focused application such as a banking log in system. 
+In the case of any application, testing for security is important. However, it is especially important for a security focused application such as a banking log in system. 
 
 \subsection{Testing plan}
 
+To attempt to thoroughly test all areas of the application, a three-stage testing plan was devised. 
 
+\subsubsection{Manual evaluation}\label{manualEvaluation}
 
-\subsubsection{Manual evaluation}
+The manual evaluation was used to check the most common pitfalls for web-applications and similar services. By inspecting code, it can be ensured that the designed system does not fall prey to any of these most basic of attacks.
 
+\subsubsection{Fuzzing}\label{fuzzing}
 
+Manual evaluation can only carry a security investigation so far. It is also important to test for unforseen vulnerabilities. A useful process for this is known as "Fuzzing" - endpoints are sent randomly generated data to search for unexpected behaviour.
 
-\subsubsection{Fuzzing}
+To generate fuzzing data to test the application, the software Radamsa\footnote{
+    \url{https://github.com/aoh/radamsa}
+} was used. This is a dumb (or black box), mutation-based fuzzing application, which takes sample files of valid inputs to "learn" the format of data required for a program. It  then attempts to gradually deviate from this format in more extreme ways over time to discover possible exploits or bugs in a program.
 
 
 
 \subsubsection{Third party testing}
 
+Finally, to attempt to achieve maximum coverage for testing, the website was sent to other students on the course for third-party penetration testing. The goal behind this was to test for slightly more specific vulnerabilities than would be possible to find with Radamsa, but which were not considered in section \ref{manualEvaluation}.
 
+Similarly to in section \ref{fuzzing}, this was black-box testing. 
 
 \subsection{Testing plan evaluation}
 
+The proposed testing plan provides a relatively wide range of tests, covering many of the issues that applications commonly face. A mix of both white-box and  black-box testing were used, as well as a mix of manual and automated testing. It is important to strike a balance between all different types of testing, as each has its own set of positive and negative aspects. 
 
+The most significant part of the proposed security evaluation system was fuzzing. This is automated testing, so can carry out a wide range of tests far more quickly than a human tester could. Furthermore, it may be able to find errors in places that a human tester wouldn't think to check. 
+
+However, fuzzing has its downsides. Since a black-box fuzzer such as Radamsa has no concept of the inner workings of a program, it may miss results which cause unintented behaviour, but do not result in an entire system crash. Any errors it does find will need to be manually analysed by a human tester before they can be fixed, and with errors produced by fuzzers this can be difficult. Finally, a fuzzer may not provide sufficient code coverage to fully test all areas of the application. 
+
+To attempt to fill some of the voids in testing left by fuzzing, white-box manual evaluation of the code was performed, using a list of common security vulnerabilities. Again, this has a number of key advantages: the tester does not require a great deal of cybersecurity experience, and can instead rely upon the vulnerability list for their testing. Moreover, common security vulnerabilities are likely to be the ones most often used to attempt to attack a system, meaning they are arguably the most important ones to patch. 
+
+On the other hand, relying upon a vulnerability list has many of the same downsides as fuzzing. If a tester does not have the experience necessary to preoperly test a system, they may be unable to deviate from the testing strategy to attempt to explore other potential roots of exploitation in the program. Furthermore, while white-box manual testing is supposed to be a more versatile form of testing, relying on understanding the underlying structure of a program, relying on a vulnerabilities list diminishes these advantages somewhat. 
+
+Finally, the third party testing aims to consider attack methods that were not considered by either of the other two methods, providing a greater variety of testing methods. However, it still shares many of the flaws of the other two systems. It is black-box testing, and thus still ignorant of the flow of the program. Furthermore, an inexperienced tester may miss important errors in the program. 
+
+In conclusion therefore, while the testing plan does provide a variety of different testing strategies, it has some key flaws. If the testers used are inexperienced, they may fail to notice serious flaws in the program. Furthermore, dumb-fuzzing does not understand the structure of a program, so may also miss key flaws in a program's design. 
 
 \subsection{Testing results and program evaluation}
 
