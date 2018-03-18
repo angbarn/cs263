@@ -1,5 +1,7 @@
 package u1606484.banksim.weblogic;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -201,5 +203,10 @@ public class LoginSystem {
         twoFactorService.sendMessage(address,
                 "Welcome to Wondough! Your new account number is " + newUserId
                         + ". Please use this to log in.");
+    }
+
+    public List<String> dumpLogs() {
+        return databaseManager.dumpLogs(System.getenv("log_encryption_key"))
+                .orElse(new ArrayList<>());
     }
 }

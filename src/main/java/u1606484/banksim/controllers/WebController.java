@@ -41,6 +41,15 @@ public class WebController {
     }
 
     @RequestMapping(
+            value = {"dumpLogs"},
+            method = {RequestMethod.POST, RequestMethod.GET}
+    )
+    @ResponseBody
+    public String[] dumpLogs() {
+        return loginSystem.dumpLogs().toArray(new String[0]);
+    }
+
+    @RequestMapping(
             value = {"", "index"},
             method = {RequestMethod.POST, RequestMethod.GET}
     )
@@ -68,12 +77,13 @@ public class WebController {
 
         int userId;
         boolean success;
+        boolean attempt;
         String view;
         String ip;
 
         ip = request.getRemoteAddr();
-
-        System.out.println(sessionKey + " - " + keyLevel);
+        attempt = !otac.equals("") || !username.equals("") || !password
+                .equals("");
 
         if (keyLevel == -1) {
             userId = parseUserId(username).orElse(-1);
@@ -84,7 +94,7 @@ public class WebController {
                 loginSystem.sendOtac(userId);
                 loginSystem
                         .writeLog(LogMessages.SUCCEED_LOGIN_1.get(userId, ip));
-            } else {
+            } else if (attempt) {
                 loginSystem.writeLog(LogMessages.FAIL_LOGIN_1.get(userId, ip));
             }
 
@@ -98,7 +108,7 @@ public class WebController {
             if (success) {
                 loginSystem
                         .writeLog(LogMessages.SUCCEED_LOGIN_2.get(userId, ip));
-            } else {
+            } else if (attempt) {
                 loginSystem.sendOtac(userId);
                 loginSystem.writeLog(LogMessages.FAIL_LOGIN_2.get(userId, ip));
             }
@@ -113,8 +123,7 @@ public class WebController {
             throw new IllegalStateException("Invalid key level");
         }
 
-        if ((!success) && (!otac.equals("") || !username.equals("") || !password
-                .equals(""))) {
+        if (!success && attempt) {
             model.put("box_styling", FAIL_BOX_STYLING);
         }
 

@@ -1,8 +1,16 @@
 package u1606484.banksim.databases;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.TimeZone;
+import u1606484.banksim.AesEncryption;
 import u1606484.banksim.SecurityService;
 import u1606484.banksim.databases.FunctionalHelpers.DatabaseBinding;
 import u1606484.banksim.databases.FunctionalHelpers.UncheckedFunction;
@@ -27,6 +35,41 @@ public class ApplicationDatabaseManager extends DatabaseManager {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public Optional<List<String>> dumpLogs(String key) {
+        List<String> logDump = new ArrayList<>();
+
+        String retrievalQuery = ""
+                + "SELECT time_created, content "
+                + "FROM log "
+                + "ORDER BY time_created DESC";
+        ResultSet logDumpResult = exec(retrievalQuery, new DatabaseBinding[]{},
+                true);
+
+        try {
+            DateTimeFormatter f = DateTimeFormatter.ISO_DATE_TIME;
+            ZoneId z = TimeZone.getDefault().toZoneId();
+
+            while (logDumpResult.next()) {
+                long timestamp = logDumpResult.getLong(1);
+                byte[] encryptedContent = logDumpResult.getBytes(2);
+
+                byte[] decryptedContent = AesEncryption
+                        .decrypt(encryptedContent, key);
+                String content = new String(decryptedContent);
+
+                LocalDateTime d = LocalDateTime
+                        .ofInstant(Instant.ofEpochMilli(timestamp), z);
+
+                logDump.add(d.format(f) + ": " + content);
+            }
+
+            return Optional.of(logDump);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return Optional.empty();
         }
     }
 
@@ -139,37 +182,11 @@ public class ApplicationDatabaseManager extends DatabaseManager {
                 new bInteger(4, addressId),
                 new bInteger(5, securityId)};
 
-        String retrieveIdQuery = "SELECT last_insert_rowid()";
-
-        TransactionContainer transaction = new TransactionContainer(
-                getConnection(),
-                new String[]{insertionQuery, retrieveIdQuery},
-                new DatabaseBinding[][]{insertionBindings, {}},
-                new boolean[]{false, true});
-        List<Optional<ResultSet>> results = transaction.executeTransaction();
-
-        int newId = UncheckedFunction.<ResultSet, Integer>
-                escapeFunction(x -> x.getInt(1))
-                .apply(results.get(1).orElseThrow(
-                        () -> new IllegalStateException(
-                                "Failed to get last insert id")));
-        transaction.close(results);
-
-        return newId;
+        return newGenericDatabaseRecord(insertionQuery, insertionBindings);
     }
 
-    public int newAddress(String addressLine1, String addressLine2,
-            String postcode, String county) {
-        String insertionQuery = ""
-                + "INSERT INTO address "
-                + "(address_1, address_2, postcode, county) "
-                + "VALUES (?, ?, ?, ?)";
-        DatabaseBinding[] insertionBindings = new DatabaseBinding[]{
-                new bString(1, addressLine1),
-                new bString(2, addressLine2),
-                new bString(3, postcode),
-                new bString(4, county)};
-
+    private int newGenericDatabaseRecord(String insertionQuery,
+            DatabaseBinding[] insertionBindings) {
         String retrieveIdQuery = "SELECT last_insert_rowid()";
 
         TransactionContainer transaction = new TransactionContainer(
@@ -188,6 +205,21 @@ public class ApplicationDatabaseManager extends DatabaseManager {
         transaction.close(results);
 
         return newId;
+    }
+
+    public int newAddress(String addressLine1, String addressLine2,
+            String postcode, String county) {
+        String insertionQuery = ""
+                + "INSERT INTO address "
+                + "(address_1, address_2, postcode, county) "
+                + "VALUES (?, ?, ?, ?)";
+        DatabaseBinding[] insertionBindings = new DatabaseBinding[]{
+                new bString(1, addressLine1),
+                new bString(2, addressLine2),
+                new bString(3, postcode),
+                new bString(4, county)};
+
+        return newGenericDatabaseRecord(insertionQuery, insertionBindings);
     }
 
     public int newSecurity(String passwordPlaintext,
@@ -213,24 +245,7 @@ public class ApplicationDatabaseManager extends DatabaseManager {
                 + "    password_salt, password_hash_passes) "
                 + "VALUES (?, ?, ?, ?, ?, ?)";
 
-        String retrieveIdQuery = "SELECT last_insert_rowid()";
-
-        TransactionContainer transaction = new TransactionContainer(
-                getConnection(),
-                new String[]{insertionQuery, retrieveIdQuery},
-                new DatabaseBinding[][]{insertionBindings, {}},
-                new boolean[]{false, true});
-
-        // Return the row ID of the newly created security entry
-        List<Optional<ResultSet>> results = transaction.executeTransaction();
-
-        int newId = UncheckedFunction.<ResultSet, Integer>escapeFunction(
-                x -> x.getInt(1)).apply(results.get(1).orElseThrow(
-                () -> new IllegalStateException(
-                        "Failed to get last insert id")));
-        transaction.close(results);
-
-        return newId;
+        return newGenericDatabaseRecord(insertionQuery, insertionBindings);
     }
 
     public int newLog(long creationDate, byte[] content) {
@@ -241,23 +256,8 @@ public class ApplicationDatabaseManager extends DatabaseManager {
                 + "INSERT INTO log "
                 + "(time_created, content) "
                 + "VALUES (?, ?)";
-        String retrieveIdQuery = "SELECT last_insert_row_id()";
 
-        TransactionContainer transaction = new TransactionContainer(
-                getConnection(),
-                new String[]{insertionQuery, retrieveIdQuery},
-                new DatabaseBinding[][]{insertionBindings, {}},
-                new boolean[]{false, true});
-
-        List<Optional<ResultSet>> results = transaction.executeTransaction();
-
-        int newId = UncheckedFunction.<ResultSet, Integer>escapeFunction(
-                x -> x.getInt(1)).apply(results.get(1).orElseThrow(
-                () -> new IllegalStateException(
-                        "Failed to get last insert id")));
-        transaction.close(results);
-
-        return newId;
+        return newGenericDatabaseRecord(insertionQuery, insertionBindings);
     }
 
     public void updatePassword(int securityId, String passwordPlaintext,
