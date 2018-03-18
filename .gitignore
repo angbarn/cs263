@@ -20,3 +20,17 @@ hs_err_pid*
 
 #idea
 .idea/*
+
+
+
+
+
+target/*
+*.pdf
+
+.idea/*
+.settings/*
+dummySend.txt
+.classpath
+.project
+*.gz
