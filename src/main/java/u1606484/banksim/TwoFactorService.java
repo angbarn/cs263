@@ -61,7 +61,7 @@ public class TwoFactorService implements ITwoFactorService {
     }
 
     @Override
-    public int getWindowSize() {
+    public int getWindowCount() {
         return otacStepWindowCount;
     }
 }
