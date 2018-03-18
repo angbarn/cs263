@@ -134,6 +134,7 @@ class FunctionalHelpers {
          *
          * @param <T> The type that the function will accept
          * @param <R> The type that the function will return
+         * @param f The function object to escape
          * @return Whatever f returns when a value would normally be applied
          * @throws RuntimeException When the UncheckedFunction would have thrown
          * a SQLException

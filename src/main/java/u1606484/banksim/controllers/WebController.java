@@ -72,6 +72,7 @@ public class WebController {
     /**
      * Testing-only endpoint for dumping log data in JSON format. This would not
      * exist in a real production build.
+     * @return Logs as an array of String objects, which Spring converts to JSON
      */
     @RequestMapping(
             value = {"dumpLogs"},

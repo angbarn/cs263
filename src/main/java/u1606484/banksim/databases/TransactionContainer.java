@@ -90,6 +90,8 @@ class TransactionContainer {
      *
      * @param queryString The string for the query
      * @param bindings The bindings for the query
+     * @param results If the query is a DML query, this should be false.
+     * Otherwise true.
      * @return If the result is required (not DML), an optional containing a
      * ResultSet for the query. Otherwise, an empty optional.
      */

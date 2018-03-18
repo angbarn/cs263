@@ -31,6 +31,10 @@ public interface IOtacGenerator {
      * IOtacGenerator#generateOtac} to produce OTACs reproducable over a window
      * of time, as opposed to for only one millisecond.
      *
+     * @param rawTimeMillis The time in milliseconds to group
+     * @param offset The number of groups away to shift the result
+     * @return The OTAC that would be generated offset groups into the future
+     * (allowing negatives) at the given time
      * @see u1606484.banksim.weblogic.LoginSystem for constants used in OTAC
      * generation.
      */

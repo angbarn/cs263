@@ -206,7 +206,7 @@ class OtacGenerator implements IOtacGenerator {
          * @param time a value that reflects a time
          * @param returnDigits number of digits to return
          * @return a numeric String in base 10 that includes {@link
-         * truncationDigits} digits
+         * returnDigits} digits
          */
         public static String generateTOTP(String key,
                 String time,
@@ -222,7 +222,7 @@ class OtacGenerator implements IOtacGenerator {
          * @param time a value that reflects a time
          * @param returnDigits number of digits to return
          * @return a numeric String in base 10 that includes {@link
-         * truncationDigits} digits
+         * returnDigits} digits
          */
         public static String generateTOTP256(String key,
                 String time,
@@ -237,7 +237,7 @@ class OtacGenerator implements IOtacGenerator {
          * @param time a value that reflects a time
          * @param returnDigits number of digits to return
          * @return a numeric String in base 10 that includes {@link
-         * truncationDigits} digits
+         * returnDigits} digits
          */
         public static String generateTOTP512(String key,
                 String time,
@@ -254,7 +254,7 @@ class OtacGenerator implements IOtacGenerator {
          * @param returnDigits number of digits to return
          * @param crypto the crypto function to use
          * @return a numeric String in base 10 that includes {@link
-         * truncationDigits} digits
+         * returnDigits} digits
          */
 
         public static String generateTOTP(String key,

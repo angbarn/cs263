@@ -54,6 +54,7 @@ public class SecurityService {
      * Gets a salt a certain number of bytes long
      *
      * @param byteCount The number of bytes long to make the salt
+     * @return A salt a certain number of bytes long
      */
     static byte[] getSalt(int byteCount) {
         byte[] bytes = new byte[byteCount];

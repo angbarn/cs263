@@ -44,6 +44,7 @@ public class AesEncryption {
      * @param data The data to process
      * @param password The password to encrypt/decrypt with
      * @param operation Whether to encrypt or decrypt
+     * @return Encrypted or decrypted bytes of data
      */
     private static byte[] swap(byte[] data, String password, int operation) {
         if (operation != Cipher.DECRYPT_MODE
@@ -98,6 +99,7 @@ public class AesEncryption {
      * of bits.
      *
      * @param password Password to enforce length for
+     * @return A key which is the exact bit-length required for AES
      */
     private static byte[] enforcePasswordLength(String password) {
         return enforcePasswordLength(password.getBytes());
@@ -110,6 +112,7 @@ public class AesEncryption {
      * of bits.
      *
      * @param password Password to enforce length for
+     * @return A key which is the exact bit-length required for AES
      */
     private static byte[] enforcePasswordLength(byte[] password) {
         byte[] passwordHash;

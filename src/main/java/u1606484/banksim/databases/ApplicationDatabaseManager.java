@@ -48,6 +48,7 @@ public class ApplicationDatabaseManager extends DatabaseManager {
      * more functionality was moved into the method for this class.
      *
      * @param key The decryption key to use
+     * @return An optional list of strings of log entries - filled on success
      */
     public Optional<List<String>> dumpLogs(String key) {
         List<String> logDump = new ArrayList<>();
