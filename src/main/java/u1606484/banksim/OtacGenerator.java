@@ -14,12 +14,22 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import u1606484.banksim.interfaces.IOtacGenerator;
 
+/**
+ * An OTAC generator based upon RFC6238
+ */
 class OtacGenerator implements IOtacGenerator {
 
     /**
      * Size of a single window, in milliseconds
+     *
+     * @see u1606484.banksim.weblogic.LoginSystem#OTAC_STEP_WINDOW
      */
     private final long windowSize;
+    /**
+     * The number of digits in an OTAC
+     *
+     * @see u1606484.banksim.weblogic.LoginSystem#OTAC_LENGTH
+     */
     private final int digitCount;
 
     OtacGenerator(int digitCount, long windowSize) {
@@ -53,6 +63,12 @@ class OtacGenerator implements IOtacGenerator {
         otacGeneration.forEach(System.out::println);
     }
 
+    /**
+     * Pads a time to at least 16 characters with 0s
+     *
+     * @param timeMillis Time to pad
+     * @return Padded time
+     */
     private String getTimeString(long timeMillis) {
         StringBuilder t = new StringBuilder();
         t.append(Long.toHexString(timeMillis).toUpperCase());
@@ -63,6 +79,15 @@ class OtacGenerator implements IOtacGenerator {
         return t.toString();
     }
 
+    /**
+     * Puts millisecond timestamp into its window equivalence class, then
+     * applies offset to shift it between classes
+     *
+     * @param rawTimeMillis Millisecond timestamp
+     * @param offset How many equivalence classes away to shift it
+     * @return A timestamp unique amongst all members of the window equivalence
+     * class
+     */
     @Override
     public long getTimestamp(long rawTimeMillis, int offset) {
         long timeMillis = (rawTimeMillis / windowSize);
@@ -71,6 +96,13 @@ class OtacGenerator implements IOtacGenerator {
         return timeMillis;
     }
 
+    /**
+     * Calls on {@link TOTP} to generate an OTAC
+     *
+     * @param secretKey The secret key to use for code generation
+     * @param timeMillis The exact time in milliseconds to create an OTAC for.
+     * @return Generated OTAC
+     */
     @Override
     public String generateOtac(byte[] secretKey, long timeMillis) {
         String stringTime = getTimeString(timeMillis);
@@ -78,7 +110,8 @@ class OtacGenerator implements IOtacGenerator {
         String stringCount = Integer.toString(digitCount);
 
 //        System.out.println(
-//                "OTAC -> " + stringTime + " " + stringKey + " " + stringCount);
+//                "OTAC -> " + stringTime + " " + stringKey + " " +
+// stringCount);
 
         return TOTP.generateTOTP512(stringTime, stringKey, stringCount);
     }
