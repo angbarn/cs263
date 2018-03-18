@@ -12,12 +12,37 @@ import java.util.Optional;
 import u1606484.banksim.databases.FunctionalHelpers.DatabaseBinding;
 import u1606484.banksim.databases.FunctionalHelpers.UncheckedConsumer;
 
+/**
+ * Some operations run on the database must be run in a single transaction to
+ * prevent concurrency issues. This class assists in doing just this, taking an
+ * array of queries, and an array of arrays of associated bindings for said
+ * queries. Finally, the class requires a connection, and an array of "required"
+ * flags, which mark a query as DML ({@code false}) or not ({@code true}).
+ */
 class TransactionContainer {
 
+    /**
+     * Connection to the database
+     */
     private final Connection conn;
+    /**
+     * Array of queries - these must be in the same order as {@code bindings}
+     */
     private final String[] queryStrings;
+    /**
+     * Array of arrays of bindings - these must be in the same order as {@code
+     * queryStrings}
+     */
     private final DatabaseBinding[][] bindings;
+    /**
+     * Array of booleans - these must be in the same order as {@code bindings}
+     * and {@code queryStrings}
+     */
     private final boolean[] resultsRequiredFlags;
+    /**
+     * The number of queries, which should match the length of the two other
+     * arrays also.
+     */
     private final int size;
 
 
@@ -40,6 +65,12 @@ class TransactionContainer {
         this.size = queryStrings.length;
     }
 
+    /**
+     * Closes {@link ResultSet}s from the un-filtered list given by this class
+     * upon execution. Also commits the {@link Connection}.
+     *
+     * @param rs The List of ResultSet Optionals to close
+     */
     void close(List<Optional<ResultSet>> rs) {
         rs.stream()
                 .filter(Optional::isPresent)
@@ -59,7 +90,8 @@ class TransactionContainer {
      *
      * @param queryString The string for the query
      * @param bindings The bindings for the query
-     * @return The result of the single query
+     * @return If the result is required (not DML), an optional containing a
+     * ResultSet for the query. Otherwise, an empty optional.
      */
     private Optional<ResultSet> executeSingle(String queryString,
             DatabaseBinding[] bindings, boolean results) {
