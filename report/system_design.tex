@@ -9,7 +9,9 @@ The proposed design for Wondough Bank's service can be seen in figure \ref{fullD
     \label{fullDesign}
 \end{figure}
 
-Connections marked with a padlock represent connections secured via SSH. Connections marked with a padlock represent connections secured via HTTPS. Unmarked connections assume an unsecured data channel.
+Connections marked with a key represent connections secured via SSH, while connections marked with a padlock represent connections secured via HTTPS. Unmarked connections assume an unsecured data channel. Red dashed boxes represent trust boundaries. 
+
+The system generally aims to compartmentalise the system as much as possible. This provides additional security, as any attacks involving more than one server require the penetration of at least one trust boundary. 
 
 \begin{figure}
     \includegraphics[width=\columnwidth]{images/web-design}
@@ -78,110 +80,110 @@ There are a wide variety of possible attacks upon the proposed Wondough bank sys
 
 \subsubsection{Spoofing}
 
-\begin{enumerate}
+\begin{numbered}
     \item \label{impersonateAudit} Impersonate audit
-    \begin{enumerate}
+    \begin{numbered}
         \item Gain access to logs
-        \begin{enumerate}
+        \begin{numbered}
             \item Retrieve potentially valuable security information
-            \begin{enumerate}
+            \begin{numbered}
                 \item Pinpoint system failures to find new vulnerabilities
                 \item Find support tickets to impersonate customer support for other attacks
-            \end{enumerate}
+            \end{numbered}
 
             \item Reconstruct customer’s bank information from transaction history
-            \begin{enumerate}
+            \begin{numbered}
                 \item Transactions
                 \item Detail changes (address, phone number, etc..)
-            \end{enumerate}
-        \end{enumerate}
-    \end{enumerate}
+            \end{numbered}
+        \end{numbered}
+    \end{numbered}
     
     \item \label{impersonateCustomerSupport} Impersonate customer support.
-    \begin{enumerate}
+    \begin{numbered}
         \item Gain access to a customer's account
         \item Change a customer's details
         \item Access a customer's details to commit identity fraud
         \item Convince a customer to move money out of their account
-    \end{enumerate}
+    \end{numbered}
 
     \item \label{impersonateMerchant} Impersonate a merchant
-    \begin{enumerate}
+    \begin{numbered}
         \item Bill customers incorrectly
-    \end{enumerate}
+    \end{numbered}
 
     \item \label{impersonateIt} Impersonate IT in any trust boundary
-    \begin{enumerate}
+    \begin{numbered}
         \item May provide direct access to servers or databases
-    \end{enumerate}
+    \end{numbered}
 
     \item \label{impersonateWebserver} Impersonate the webserver or the support server
-    \begin{enumerate}
+    \begin{numbered}
         \item Genuine users could connect to them mistakenly, allowing credentials to be stolen
         \item Could forge requests to other servers
-    \end{enumerate}
-\end{enumerate}
+    \end{numbered}
+\end{numbered}
 
 \subsubsection{Tampering}
 
-\begin{enumerate}[resume]
+\begin{numbered}[resume]
 
     \item \label{tamperAccountDatabase} IT could change account database without permission
 
     \item \label{tamperMerchantDatabase} IT could change merchant database without permission
-    \begin{enumerate}
+    \begin{numbered}
         \item Allow arbitrary authorisation of merchants
         \item Allow arbitrary de-authorisation of merchants
-    \end{enumerate}
+    \end{numbered}
 
     \item \label{tamperSupportTickets} IT could alter support tickets
-    \begin{enumerate}
+    \begin{numbered}
         \item Create fake tickets to waste staff time
         \item Alter/delete tickets to cause customer dis-satisfaction
-    \end{enumerate}
-\end{enumerate}
+    \end{numbered}
+\end{numbered}
 
 \subsubsection{Repudiation}
 
-\begin{enumerate}[resume]
+\begin{numbered}[resume]
     \item \label{repudiationFraud} The customer pretends to be the victim of fraud
-    \begin{enumerate}
+    \begin{numbered}
         \item The bank must cover assets lost by fraud
-    \end{enumerate}
+    \end{numbered}
 
     \item \label{repudiationIt} Malicious activity by IT staff
     \item \label{repudiationCustomerSupport} Malicious activity by customer support
-\end{enumerate}
+\end{numbered}
 
 \subsubsection{Information disclosure}
 
-\begin{enumerate}[resume]
+\begin{numbered}[resume]
     \item \label{disclosureCustomerSupport} Malicious access to a customer's account by member of customer support
     
     \item \label{disclosureItDetails} A member of IT successfully attacks the account database, revealing a customer's information
 
     \item \label{disclosureItKeys} A member of IT accesses any of the keys used for encryption
-\end{enumerate}
+\end{numbered}
 
 \subsubsection{Denial of service}
 
-\begin{enumerate}[resume]
+\begin{numbered}[resume]
     \item \label{dosWebsite} DoS attack on website
     \item \label{dosCustomerSupport} DoS attack on customer support service
     \item \label{dosBillingServer} DoS attack on billing server
     \item \label{dosBankingServer} DoS attack on banking server
     \item \label{dosLogs} DoS attack on logs
-\end{enumerate}
+\end{numbered}
 
 \subsubsection{Elevation of privilege}
 
-\begin{enumerate}[resume]
+\begin{numbered}[resume]
     \item \label{eopXss} XSS attack using website
     \item \label{eopSqlInjection} SQL Injection using website registration form
     \item \label{eopCustomerSupport} XSS attack or SQL injection using customer support software
     \item \label{eopValidationDifference} Different servers could validate data differently when sending data to be logged – if some paths give different results, an attacker could exploit this
     \item \label{eopClientSideValidation} An attacker could bypass client-side validation and send un-validated information to a server
-\end{enumerate}
+\end{numbered}
 
 \subsection{Threat solution and evaluation}
 
@@ -238,9 +240,9 @@ There are a wide variety of possible attacks upon the proposed Wondough bank sys
         This solution can be solved in a similar manner to that of \ref{eopXss} and \ref{eopSqlInjection}.
     \\ \hline \ref{eopValidationDifference} & 
         All validation occurs when data is first input to the system, meaning that only one, centralised validation check is necessary.
-    \\ \hline \ref{eopClientSideValidation}
+    \\ \hline \ref{eopClientSideValidation} &
         The system does not rely on any form of client-side validation.
-    \\
+    \\ \hline
 
 \end{longtable}
 
