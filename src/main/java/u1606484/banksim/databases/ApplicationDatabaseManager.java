@@ -116,11 +116,12 @@ public class ApplicationDatabaseManager extends DatabaseManager {
      * Attempts to fetch information on a user's session, provided in a {@link
      * UserAuthenticationPackage} instance.
      *
+     * <p>This should never return an empty optional due to database
+     * constraints.
+     *
      * @param sessionKey The session key to find information for
      * @return A single UserAuthenticationPackage instance if a matching user
      * can be found. Otherwise, an empty optional.
-     * @apiNote This should never return an empty optional due to database
-     * constraints.
      */
     public Optional<UserAuthenticationPackage> getUserData(String sessionKey) {
         String retrievalQuery = ""
@@ -390,11 +391,12 @@ public class ApplicationDatabaseManager extends DatabaseManager {
     /**
      * Attempts to fetch data about a user's password
      *
+     * <p>This should never return an empty optional due to database
+     * constraints.
+     *
      * @param userId The account ID to fetch data for
      * @return An optional containing a PasswordData instance if a password
      * could be located. Otherwise, an empty optional.
-     * @apiNote This should never return an empty optional due to database
-     * constraints.
      * @see PasswordData
      */
     public Optional<PasswordData> getPasswordData(int userId) {
@@ -423,11 +425,12 @@ public class ApplicationDatabaseManager extends DatabaseManager {
     /**
      * Attempts to fetch a user's secret key to use for OTAC generation.
      *
+     * <p>This should never return an empty optional due to database
+     * constraints.
+     *
      * @param userId The account ID to fetch the login secret key for
      * @return An optional containing the login secret key, if available.
      * Otherwise, an empty optional.
-     * @apiNote This should never return an empty optional due to database
-     * constraints.
      */
     public Optional<byte[]> fetchLoginKey(int userId) {
         String retrievalQuery = ""
@@ -445,11 +448,12 @@ public class ApplicationDatabaseManager extends DatabaseManager {
     /**
      * Attempts to fetch a user's phone number to use for 2FA.
      *
+     * <p>This should never return an empty optional due to database
+     * constraints.
+     *
      * @param userId The account ID to fetch the phone number
      * @return An optional containing the phone number, if available. Otherwise,
      * an empty optional.
-     * @apiNote This should never return an empty optional due to database
-     * cosntraints.
      */
     public Optional<String> fetchPhoneNumber(int userId) {
         String retrievalQuery = ""

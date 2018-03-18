@@ -205,8 +205,7 @@ class OtacGenerator implements IOtacGenerator {
          * @param key the shared secret, HEX encoded
          * @param time a value that reflects a time
          * @param returnDigits number of digits to return
-         * @return a numeric String in base 10 that includes {@link
-         * returnDigits} digits
+         * @return a numeric String in base 10 that includes returnDigits digits
          */
         public static String generateTOTP(String key,
                 String time,
@@ -221,8 +220,7 @@ class OtacGenerator implements IOtacGenerator {
          * @param key the shared secret, HEX encoded
          * @param time a value that reflects a time
          * @param returnDigits number of digits to return
-         * @return a numeric String in base 10 that includes {@link
-         * returnDigits} digits
+         * @return a numeric String in base 10 that includes returnDigits digits
          */
         public static String generateTOTP256(String key,
                 String time,
@@ -236,8 +234,7 @@ class OtacGenerator implements IOtacGenerator {
          * @param key the shared secret, HEX encoded
          * @param time a value that reflects a time
          * @param returnDigits number of digits to return
-         * @return a numeric String in base 10 that includes {@link
-         * returnDigits} digits
+         * @return a numeric String in base 10 that includes returnDigits digits
          */
         public static String generateTOTP512(String key,
                 String time,
@@ -253,8 +250,7 @@ class OtacGenerator implements IOtacGenerator {
          * @param time a value that reflects a time
          * @param returnDigits number of digits to return
          * @param crypto the crypto function to use
-         * @return a numeric String in base 10 that includes {@link
-         * returnDigits} digits
+         * @return a numeric String in base 10 that includes returnDigits digits
          */
 
         public static String generateTOTP(String key,
