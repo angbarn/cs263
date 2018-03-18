@@ -63,7 +63,7 @@ There are a wide variety of possible attacks upon the proposed Wondough bank sys
 \subsubsection{Spoofing}
 
 \begin{enumerate}
-    \item Impersonate audit
+    \item Impersonate audit \label{impersonateAudit}
     \begin{enumerate}
         \item Gain access to logs
         \begin{enumerate}
@@ -81,7 +81,7 @@ There are a wide variety of possible attacks upon the proposed Wondough bank sys
         \end{enumerate}
     \end{enumerate}
     
-    \item Impersonate customer support.
+    \item \label{impersonateCustomerSupport} Impersonate customer support.
     \begin{enumerate}
         \item Gain access to a customer's account
         \item Change a customer's details
@@ -89,17 +89,17 @@ There are a wide variety of possible attacks upon the proposed Wondough bank sys
         \item Convince a customer to move money out of their account
     \end{enumerate}
 
-    \item Impersonate a merchant
+    \item \label{impersonateMerchant} Impersonate a merchant
     \begin{enumerate}
         \item Bill customers incorrectly
     \end{enumerate}
 
-    \item Impersonate IT in any trust boundary
+    \item \label{impersonateIt} Impersonate IT in any trust boundary
     \begin{enumerate}
         \item May provide direct access to servers or databases
     \end{enumerate}
 
-    \item Impersonate the webserver or the support server
+    \item \label{impersonateWebserver} Impersonate the webserver or the support server
     \begin{enumerate}
         \item Genuine users could connect to them mistakenly, allowing credentials to be stolen
         \item Could forge requests to other servers
@@ -184,7 +184,66 @@ There are a wide variety of possible attacks upon the proposed Wondough bank sys
 
 \subsection{Threat solution and evaluation}
 
+\begin{center}\begin{tabular}{|| p{3em} | p{15em} ||}
+    \hline
+    Threat & Solution \\
+    \hline\hline
 
+              \ref{impersonateAudit} & 
+        It is assumed for the purposes of this design that any system involving legislation-mandated auditors will involve sufficient authentication checking steps.
+    \\ \hline \ref{impersonateCustomerSupport} & 
+        Customer support will be required to log in via a web-interface. Log-ins will make use of the employee's phone to provide two-factor authentication.
+    \\ \hline \ref{impersonateMerchant} &
+        Upon an initial connection, a merchant is required to provide their Identifying Name, which is used to fetch a corresponding secret key from the database. All future traffic between parties is encrypted using this secret key. An attacker would have to obtain this secret key in order to impersonate any merchant.
+    \\ \hline \ref{impersonateIt} &
+        Similarly to Customer Support staff, IT staff must undergo two-factor authentication before connecting to the database. A possible method to secure this attack surface further is to issue employee cards and card readers. Similarly to a home-banking card reader, these could provide a one time login code for the IT member.
+    \\ \hline \ref{impersonateWebserver} &
+        All webserver connections will be secured using HTTPS, which guarantees the identity of a connecting party.
+    \\ \hline \ref{tamperLogs} &
+        
+    \\ \hline \ref{tamperAccountDatabase} &
+        
+    \\ \hline \ref{tamperMerchantDatabase} &
+        
+    \\ \hline \ref{tamperSupportTickets} &
+        
+    \\ \hline \ref{repudiationFraud} &
+        
+    \\ \hline \ref{repudiationIt} &
+        
+    \\ \hline \ref{repudiationCustomerSupport} &
+        
+    \\ \hline \ref{disclosureCustomerSupport} &
+        
+    \\ \hline \ref{disclosureIt} &
+        
+    \\ \hline \ref{disclosureItDetails} &
+        
+    \\ \hline \ref{disclosureItKeys} &
+        
+    \\ \hline \ref{dosWebsite} &
+        
+    \\ \hline \ref{dosCustomerSupport} &
+        
+    \\ \hline \ref{dosBillingServer} &
+        
+    \\ \hline \ref{dosBankingServer} &
+        
+    \\ \hline \ref{dosLogs} &
+
+    \\ \hline \ref{eopXss} &
+
+    \\ \hline \ref{eopSqlInjection} &
+        
+    \\ \hline \ref{eopCustomerSupport} &
+
+    \\ \hline \ref{eopValidationDifference} & 
+        
+    \\ \hline \ref{eopClientSideValidation}
+        
+    \\
+
+\end{tabular}\end{center}
 
 \subsection{Legal and economic considerations}
 
@@ -198,18 +257,12 @@ There are a number of other considerations which must be considered for the desi
 
 A system which fully meets or exceeds all requirements may still be prohibitively expensive for a small scale, start-up company like Wondough Bank to deploy, and thus may be unrealistic. It is necessary to consider the compromises which have to be made when designing such a system. 
 
-\subsubsubsection{Hosting}
-
 Firstly, the choice of server host is important. While larger banks are able to afford their own dedicated servers for online banking, it may be necessary for a company on the scale of Wondough Bank to turn to a cloud-based hosting service such as Amazon Web Services or Microsoft Azure. While an in-house hosting solution may be cheaper in the long run, an organisation such as Wondough Bank may be unable to meet the necessary up-front expenditure.
 
 However, hosting Wondough Bank's web-app in the cloud has some key advantages. Firstly, while the organisation is currently small, their intended scope for expansion is large. This is an area in which cloud services excel, and Wondough would need only to pay for any increased usage. If Wondough Bank were to install their own hosting infrastructure, they may find future expansion or upgrades costly.
 
 Also, many hosts are willing to accept a large part of the responsibility for the security of data transmitted and stored on their servers. This means that Wondough Bank's resources may be focused more in other areas, and allows them to transfer risk to third parties. However, this may be disadvantageous, and Wondough Bank may want to be certain exactly what level of security data is afforded - a task which could be difficult when dealing with a large hosting company.
 
-\subsubsubsection{Key security}
-
 In the interests of security, Hardware Security Modules (HSMs) would be advantageous for any implementation of a secure system. Fortunately, many hosting services provide support for storing keys and passwords on HSMs.
 
-\subsubsubsection{Software}
-
-For an organisation such as Wondough Bank, software lisences may be expensive. For example, certain implementations of SQL can be highly-priced. However, similarly to HSMs, hosting services may offer a "pay-by-use" pricing system for such software, moving a single fixed cost to several smaller, variable ones.
+Finally, For an organisation such as Wondough Bank, software lisences may be expensive. For example, certain implementations of SQL can be highly-priced. However, similarly to HSMs, hosting services may offer a "pay-by-use" pricing system for such software, moving a single fixed cost to several smaller, variable ones.
