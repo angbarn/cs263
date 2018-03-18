@@ -67,10 +67,26 @@ public class AesEncryption {
         }
     }
 
+    /**
+     * Thin wrapper for {@link AesEncryption#swap} for encrypting
+     *
+     * @param data The data to encrypt
+     * @param password The password to use to encrypt it
+     * @return Encrypted data
+     * @see AesEncryption#swap
+     */
     public static byte[] encrypt(byte[] data, String password) {
         return swap(data, password, Cipher.ENCRYPT_MODE);
     }
 
+
+    /**
+     * Thin wrapper for {@link AesEncryption#swap} for decrypting
+     * @param data The data to decrypt
+     * @param password The password to use to decrypt it
+     * @return Decrypted data
+     * @see AesEncryption#swap
+     */
     public static byte[] decrypt(byte[] data, String password) {
         return swap(data, password, Cipher.DECRYPT_MODE);
     }
