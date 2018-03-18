@@ -8,6 +8,9 @@ import java.util.Optional;
 import u1606484.banksim.interfaces.IOtacGenerator;
 import u1606484.banksim.interfaces.ITwoFactorService;
 
+/**
+ * @deprecated Please use {@link TwoFactorService}
+ */
 public class DummyTwoFactor implements ITwoFactorService {
 
     private static final String FILE_NAME = "dummySend.txt";
@@ -43,8 +46,8 @@ public class DummyTwoFactor implements ITwoFactorService {
     }
 
     @Override
-    public String generateOtac(byte[] secretKey, int offset) {
-        return generator.generateOtac(secretKey, offset);
+    public String generateOtac(byte[] secretKey, int timeMillis) {
+        return generator.generateOtac(secretKey, System.currentTimeMillis());
     }
 
     @Override

@@ -1,10 +1,13 @@
 package u1606484.banksim.weblogic;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import u1606484.banksim.DummyTwoFactor;
+import u1606484.banksim.AesEncryption;
 import u1606484.banksim.SecurityService;
+import u1606484.banksim.TwoFactorService;
 import u1606484.banksim.databases.ApplicationDatabaseManager;
 import u1606484.banksim.databases.PasswordData;
 import u1606484.banksim.databases.SessionKeyPackage;
@@ -34,10 +37,18 @@ public class LoginSystem {
 
     public LoginSystem() {
         databaseManager = new ApplicationDatabaseManager();
-        twoFactorService = new DummyTwoFactor(
+        twoFactorService = new TwoFactorService(
                 OTAC_LENGTH,
                 OTAC_STEP,
                 OTAC_STEP_WINDOW);
+    }
+
+    public void writeLog(String content) {
+        byte[] encyptedContent = AesEncryption.encrypt(content.getBytes(),
+                System.getenv("log_encryption_key"));
+        long timestamp = System.currentTimeMillis();
+
+        databaseManager.newLog(timestamp, encyptedContent);
     }
 
     /*
@@ -191,5 +202,10 @@ public class LoginSystem {
         twoFactorService.sendMessage(address,
                 "Welcome to Wondough! Your new account number is " + newUserId
                         + ". Please use this to log in.");
+    }
+
+    public List<String> dumpLogs() {
+        return databaseManager.dumpLogs(System.getenv("log_encryption_key"))
+                .orElse(new ArrayList<>());
     }
 }
