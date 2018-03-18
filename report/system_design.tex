@@ -1,3 +1,25 @@
-\section{System design}
+\section{Proposed system}
 
-This section deals with design
+\subsection{Security measures}
+\subsubsection{Customer support verification}
+
+One common attack vector for bank customers is impersonating a member ofcustomer
+support. Similarly, a member of customer support could potentially ``go rogue'' 
+and attack a customer’s account.
+
+While many consider phonelines to be a safe method of communication, ``vishing''
+or ``voice phishing'' is on the rise. \cite{bbcPhone} Phone number spoofing can make an
+illegitimate call appear to be from a legitimate source. Holding open a line can
+redirect a call from a customer to their bank towards an attacker.
+
+Such techniques mean that verification of both Wondough Bank’s staff members and customers is necessary in every situation. The proposed system to satisfy such a goal is displayed in Figure 2.
+
+First, a customer contacts a member of customer support through a potentially insecure connection, such as a phone call. Alternatively, a member of customer support may contact the customer first. (step 1)
+
+To authenticate to the customer, the staff member’s customer service terminal will provide a one-time access code (OTAC) generated from the time, the staff member’s credentials, and the customer’s credentials. The staff member passes this to a customer, who verifies it using the Wondough Bank phone app. (step 2-5)
+
+After verifying the customer support member’s OTAC, the phone app will provide a customer’s own OTAC. They must then provide this to the customer support representative. (step 6-8)
+
+The customer service web application will send both OTACs to the customer support server, which will verify the codes server-side, before granting the staff member access to the customer’s account.
+
+Such a system requires authorisation and consent from both the staff member and the customer before any changes to a customer’s account may be made.
