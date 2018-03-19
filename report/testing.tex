@@ -1,6 +1,6 @@
 \section{Testing and evaluation}
 
-In the case of any application, testing for security is important. However, it is especially important for a security focused application such as a banking log in system. 
+In the case of any application, testing for security is important. However, it is especially important for a security focused application such as an online banking system. 
 
 \subsection{Testing plan}
 
@@ -8,7 +8,15 @@ To attempt to thoroughly test all areas of the application, a three-stage testin
 
 \subsubsection{Manual evaluation}\label{manualEvaluation}
 
-The manual evaluation was used to check the most common pitfalls for web-applications and similar services. By inspecting code, it can be ensured that the designed system does not fall prey to any of these most basic of attacks.
+Manual evaluation using a vulnerabilities list was used to check the most common pitfalls for web-applications and similar services. By inspecting code, it can be ensured that the designed system does not fall prey to any of these most basic attacks.
+
+The list of common vulnerabilities used was the OWASP top 10 \footnote{ \nocite{owaspTop10}
+    The OWASP Top 10 Application Security Risks from 2017 was used as the list of common vulnerabilities. \url{https://www.owasp.org/images/7/72/OWASP_Top_10-2017_\%28en\%29.pdf.pdf}.
+}.
+
+Furthermore, the Microsoft card game Elevation of Privilege \footnote{
+    \url{https://www.microsoft.com/en-us/SDL/adopt/eop.aspx} \nocite{microsoftCardGame}
+} was used as an additional reference for potential security vulnerabilities.
 
 \subsubsection{Fuzzing}\label{fuzzing}
 
@@ -16,9 +24,7 @@ Manual evaluation can only carry a security investigation so far. It is also imp
 
 To generate fuzzing data to test the application, the software Radamsa\footnote{
     \url{https://github.com/aoh/radamsa}
-} was used. This is a dumb (or black box), mutation-based fuzzing application, which takes sample files of valid inputs to "learn" the format of data required for a program. It then attempts to gradually deviate from this format in more extreme ways over time to discover possible exploits or bugs in a program.
-
-
+} was used. This is a dumb (or black box), mutation-based fuzzing application, which takes sample files of valid inputs to "learn" the format of data required for a program. It then attempts to gradually deviate from this format in more extreme ways over time to discover possible exploits or bugs in a program. \cite{mwrFuzzing}
 
 \subsubsection{Third party testing}
 
@@ -32,27 +38,50 @@ The proposed testing plan provides a relatively wide range of tests, covering ma
 
 The most significant part of the proposed security evaluation system was fuzzing. This is automated testing, so can carry out a wide range of tests far more quickly than a human tester could. Furthermore, it may be able to find errors in places that a human tester wouldn't think to check. 
 
-However, fuzzing has its downsides. Since a black-box fuzzer such as Radamsa has no concept of the inner workings of a program, it may miss results which cause unintented behaviour, but do not result in an entire system crash. Any errors it does find will need to be manually analysed by a human tester before they can be fixed, and with errors produced by fuzzers this can be difficult. Finally, a fuzzer may not provide sufficient code coverage to fully test all areas of the application. 
+Fuzzing has its downsides. Since a black-box fuzzer such as Radamsa has no concept of the inner workings of a program, it may miss results which cause unintented behaviour, but do not result in an entire system crash. Any errors it does find will need to be manually analysed by a human tester before they can be fixed, and with errors produced by fuzzers this can be difficult. Finally, a fuzzer may not provide sufficient code coverage to fully test all areas of the application. 
 
-To attempt to fill some of the voids in testing left by fuzzing, white-box manual evaluation of the code was performed, using a list of common security vulnerabilities. Again, this has a number of key advantages: the tester does not require a great deal of cybersecurity experience, and can instead rely upon the vulnerability list for their testing. Moreover, common security vulnerabilities are likely to be the ones most often used to attempt to attack a system, meaning they are arguably the most important ones to patch. 
+To attempt to fill some of the voids in code coverage left by fuzzing, manual testing in the form of white-box testing and third-party black box testing were used. Both of these have their advantages - by comparing against a list of known common vulnerabilities in the white-box testing, less cybersecurity experience is required. Furthermore, the most common vulnerabilities are arguably the most likely to be exploited. 
 
-On the other hand, relying upon a vulnerability list has many of the same downsides as fuzzing. If a tester does not have the experience necessary to preoperly test a system, they may be unable to deviate from the testing strategy to attempt to explore other potential roots of exploitation in the program. Furthermore, while white-box manual testing is supposed to be a more versatile form of testing, relying on understanding the underlying structure of a program, relying on a vulnerabilities list diminishes these advantages somewhat. 
+However, the white-box testing and third-party testing still rely on the tester having a working knowledge of cybersecurity. If this is not the case, they may miss important bugs, leaving flaws in the program. Black-box testing is also ignorant of the program's data flow, sharing many of the same problems as fuzzing.
 
-Finally, the third party testing aims to consider attack methods that were not considered by either of the other two methods, providing a greater variety of testing methods. However, it still shares many of the flaws of the other two systems. It is black-box testing, and thus still ignorant of the flow of the program. Furthermore, an inexperienced tester may miss important errors in the program. 
-
-In conclusion therefore, while the testing plan does provide a variety of different testing strategies, it has some key flaws. If the testers used are inexperienced, they may fail to notice serious flaws in the program. Furthermore, dumb-fuzzing does not understand the structure of a program, so may also miss key flaws in a program's design. 
+In conclusion, while the testing plan does provide a variety of different testing strategies, it has some key flaws. The plan attempts to rely on automated fuzzing testing to do a large amount of the work. Normally, the downsides of fuzzing would be compensated for by the manual aspect of testing. However, the relative inexperience of the testers used to carry out the other areas of testing means that this is not the case.
 
 \subsection{Testing results and program evaluation}
 
-
-
 \subsubsection{Manual evaluation}
 
+Several potential vulnerabilities were found using the Elevation of Privilege card game.
 
+\begin{itemize}
+
+    \item ``An attacker could try one credential after another and there’s nothing to slow them down (online or offline)'' - while this is the case in the web app, passwords are mandated to have a minimum length of 16 characters. Assuming only lower case characters are used, this provides $ \log_2 ({26}^{16}) \approx 75 $ bits of entropy - sufficient for the purposes of this application.
+
+    \item ``An attacker can discover the fixed key being used to encrypt'' - While it would be difficult for an attacker to discover any keys within the program, it may be worth considering implementing dynamically changing keys for the database for a future design of the program.
+
+    \item Denial of service - as previously mentioned, no attempt in the program was made to guard against denial of service attacks. A simple solution would be to keep track of connecting IP addresses, and reject connections from those making too many requests in a short space of time.
+
+\end{itemize}
+
+In the OWASP top 10, just one vulnerability was relevant to the application's implementation.
+
+\begin{itemize}
+
+    \item ``Insufficient Logging \& Monitoring'' - the applicatioin's logging is limited. For example, errors occuring in the program are generally handled, but not reported correctly via the logging system. A future iteration should have more detailed logs about activities in the system.
+
+\end{itemize}
 
 \subsubsection{Fuzzing}
 
+Overall, the application handled the fuzzing provided well. This could be for a variety of reasons. Firstly, Java's String management is relatively secure compared to a programming language such as C. Since all requests ultimately take the form of strings, it was very difficult for the fuzzing software to find a string that Java could not handle by itself.
 
+Furthermore, any parsing of strings was performed by Java's in-built methods, meaning they were well implemnted and tested. Exceptions thrown by these methods were caught correctly and dealt with appropriately, preventing complications elsewhere in the program.
+
+However, while fuzzing was unable to find any security vulnerabilities, this is unlikely to mean there aren't any present in the program. Due to resource constraints, a sample size of data in the 100s was taken. It may be possible that a sample size several orders of magnitude higher would yield possible vulnerabilities within the program. 
 
 \subsubsection{Third party testing}
 
+Unfortunately, the third party testing was unable to find any vulnerabilities in the code. Similarly to the result for fuzzing, this does not mean holes in the webapp's security aren't present - it is far more likely that the inexperience of the third party was responsible for more bugs not being found.
+
+\subsubsection{Evaluation}
+
+Ultimately, while the testing suite was flawed, the program did perform well. While it is likely that attack vectors have remained undiscovered, the program performed well against almost all trials within the testing scope.
