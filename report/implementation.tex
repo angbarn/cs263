@@ -6,7 +6,7 @@ The app is hosted at \url{https://wondough.herokuapp.com/}.
 
 \subsection{Scope and implementation specifics}
 
-The implementation focuses only upon the login system, and two factor authentication for it. No attempt was amde to implement any other functionality into the banking web-app.
+The implementation focuses only upon the login system, and two factor authentication for it. No attempt was made to implement any other functionality into the banking web-app.
 
 None of the dependencies used have any serious, known security flaws.
 
@@ -14,7 +14,7 @@ None of the dependencies used have any serious, known security flaws.
 
     \item The page is secured via an HTTPS certificate, provided by Heroku. This means that any data sent to or from the page is encrypted, defeating possible man-in-the-middle attacks. 
 
-    \item The system logs user actions made on the website. For the purpsoes of testing, these logs are accessible as JSON via \url{https://wondough.herokuapp.com/dumpLogs}. Logs are encrypted using a 128-bit AES cipher. 
+    \item The system logs user actions made on the website. For the purposes of testing, these logs are accessible as JSON via \url{https://wondough.herokuapp.com/dumpLogs}. Logs are encrypted using a 128-bit AES cipher. 
 
     \item The system uses Twilio's free trial to provide SMS-based two-factor authentication. 
 
@@ -26,7 +26,7 @@ None of the dependencies used have any serious, known security flaws.
 
 \subsection{Simplifications and alterations}
 
-A number of abstractions were made in the implementation, compared to how the web-app would function in a real-world production environment. 
+A few abstractions were made in the implementation, compared to how the web-app would function in a real-world production environment. 
 
 \begin{itemize}
 

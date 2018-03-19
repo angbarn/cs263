@@ -49,11 +49,11 @@ Such a system requires authorisation and consent from both the staff member and 
 
 \subsubsection{Transaction integrity}
 
-In order to guarantee the integrity of all transactions in the database, anapproach similar to Bitcoin's blockchain \cite{blockchain} will be used.
+To guarantee the integrity of all transactions in the database, an approach like Bitcoin's blockchain \cite{blockchain} will be used.
 
-Every transaction will contain a hash made up of its own contents, the previous transaction's hash, and a random nonce. This nonce will be chosen so that the hash is in a specific form. For example, requiring the hash to start with a certain number of zeros. In order for a transaction to be accepted by the database, the hash field will be re-calculated on insertion, and verified for formatting. The formatting required may be changed in order to vary the amount of work required to calculate one hash.
+Every transaction will contain a hash made up of its own contents, the previous transaction's hash, and a random nonce. This nonce will be chosen so that the hash is in a specific form. For example, requiring the hash to start with a certain number of zeros. In order for a transaction to be accepted by the database, the hash field will be re-calculated on insertion, and verified for formatting. The formatting required may be change to vary the amount of work required to calculate one hash.
 
-In order for a malicious party to alter a previous transaction, they would have to re-calculate every hash between the altered entry and the most recent entry. Recalculation would need to be performed at a rate greater than that of transactions incoming to the bank. Therefore, in order to maliciously altery the contents of any transactions in the banking system, an attacker would require more total computing power than Wondough Bank owns. While initially Wondough Bank may be a small scale operation, as they grow, this will be harder and harder to achieve.
+For a malicious party to alter a previous transaction, they would have to re-calculate every hash between the altered entry and the most recent entry. Recalculation would need to be performed at a rate greater than that of transactions incoming to the bank. Therefore, to maliciously alter the contents of any transactions in the banking system, an attacker would require more total computing power than Wondough Bank owns. While initially Wondough Bank may be a small-scale operation, as they grow, this will be harder and harder to achieve.
 
 \subsubsection{Merchant authorisation}
 
@@ -191,7 +191,7 @@ There are a wide variety of possible attacks upon the proposed Wondough bank sys
     \\ \hline \ref{impersonateMerchant} &
         Upon an initial connection, a merchant provides their Identifying Name, and a corresponding key is fetched from the database. All future traffic between parties is encrypted.
     \\ \hline \ref{impersonateIt} &
-        IT staff must use two-factor authentication to connect to the database. A possible improvement would be to issue IT staff ID cards and card readers. Similarly to a home-banking card reader, these could provide a one time login code for the IT member.
+        IT staff must use two-factor authentication to connect to the database. A possible improvement would be to issue IT staff ID cards and card readers. Similarly to a home-banking card reader, these could provide a one-time login code for the IT member.
     \\ \hline \ref{impersonateWebserver} &
         All webserver connections will be secured using HTTPS, which provides a digital certificate.
     \\ \hline \ref{tamperAccountDatabase} \ref{tamperMerchantDatabase} &
@@ -205,11 +205,11 @@ There are a wide variety of possible attacks upon the proposed Wondough bank sys
     \\ \hline \ref{disclosureCustomerSupport} &
         Customer support staff do not have the necessary access permissions for a customer's account details without the customer first providing them with their account ID and a one-time password.
     \\ \hline \ref{disclosureItDetails} \ref{disclosureItKeys} &
-        The database will be encrypted, and neceessary keys for decryption will be stored on HSMs, secured from IT staff.
+        The database will be encrypted, and necessary keys for decryption will be stored on HSMs, secured from IT staff.
     \\ \hline \textcolor{red}{\ref{dosWebsite}} &
         This is a possible weakness in the proposed design. No attempt was made in the design to mitigate denial of service attacks.
 
-        A possible solution would be to track the IP address of incoming users, and deny access through the use of a firewall to users who make too many requests in too short of a length of time. However, this would still not stop bot-net attacks using many different IP addresses, or IP spoofing, which would rely on a solution at the ISP level.
+        A possible solution would be to track the IP address of incoming users, and use a firewall to deny access to users who make too many requests in too short of a length of time. However, this would still not stop bot-net attacks using many different IP addresses, or IP spoofing, which would rely on a solution at the ISP level.
     \\ \hline \textcolor{red}{\ref{dosCustomerSupport}} &
         Similarly, a full solution to DoS attacks on the customer support website is impossible as the service exists in the current design.
 
@@ -221,7 +221,7 @@ There are a wide variety of possible attacks upon the proposed Wondough bank sys
     \\ \hline \textcolor{red}{\ref{dosLogs}} &
         This is a possible flaw in the system's design. For example, deliberately failing to log in repeatedly would write a lot of data to the logging system. Since this data is encrypted, this could be an expensive operation, and effectively perform a DoS attack on the logging server.
 
-        A possible solution would be to distribute the logging server over a number of machines. Each machine would have a local cache, used to store frequent logs. This logs could be grouped together, before beging written to the central logging server in one transaction, minimising load.
+        A possible solution would be to distribute the logging server over several machines. Each machine would have a local cache, used to store frequent logs. These logs could be grouped together, before being written to the central logging server in one transaction, minimising load.
 
         This solution would also remove the single point of failure in the system that is the logging server.
     \\ \hline \ref{eopXss} &
@@ -240,19 +240,19 @@ There are a wide variety of possible attacks upon the proposed Wondough bank sys
 
 \subsection{Legal and economic considerations}
 
-There are a number of other considerations which must be considered for the design of the Wondough banking system.
+There are several other considerations which must be considered for the design of the Wondough banking system.
 
 \subsubsection{Legal requirements}
 
 While there are many legal requirements for a business such as Wondough Bank, arguably the most important two are the UK's Data Protection Act from 1998 \cite{dataProtectionAct}, and the EU's General Data Protection Regulation, which will come in to force in 2018 \cite{generalDataProtectionRegulation}. 
 
-The Data Protect Act states that data must be kept securely. As a banking application, security requirements are higher than for the general case web serice that The Data Protection Act was written for, so meeting these would not be a concern. However, the act states that data cannot be transmitted outside the European Economic Area without adequate protection. If Wondough Bank were to host their website using a cloud service, it may be necessary to ensure any data sent outside of the country was done so with adequate protection.
+The Data Protect Act states that data must be kept securely. As a banking application, security requirements are higher than for the general case web service that The Data Protection Act was written for, so meeting these would not be a concern. However, the act states that data cannot be transmitted outside the European Economic Area without adequate protection. If Wondough Bank were to host their website using a cloud service, it may be necessary to ensure any data sent outside of the country was done so with adequate protection.
 
-The EU's General Data Protecion Regulation is similar to the Data Protection Act, but provides more rights to a service's customers. For example, the act mandates that all data breaches are announced within 72 hours.
+The EU's General Data Protection Regulation is similar to the Data Protection Act, but provides more rights to a service's customers. For example, the act mandates that all data breaches are announced within 72 hours.
 
 \subsubsection{Economic constraints}
 
-A system which fully meets or exceeds all requirements may still be prohibitively expensive for a small scale, start-up company like Wondough Bank to deploy, and thus may be unrealistic. It is necessary to compromise when designing such a system. 
+A system which fully meets or exceeds all requirements may still be prohibitively expensive for a small-scale, start-up company like Wondough Bank to deploy, and thus may be unrealistic. It is necessary to compromise when designing such a system. 
 
 Firstly, the choice of server host is important. Larger banks are able to afford their own dedicated servers for online banking, but it may be necessary for a company on the scale of Wondough Bank to turn to a cloud-based hosting service such as Amazon Web Services or Microsoft Azure. While an in-house hosting solution may be cheaper in the long run, an organisation such as Wondough Bank may be unable to meet the necessary up-front expenditure.
 
@@ -262,5 +262,5 @@ Also, many hosts are willing to accept a large part of the responsibility for th
 
 In the interests of security, Hardware Security Modules (HSMs) would be advantageous for any implementation of a secure system. Fortunately, many hosting services provide support for storing keys and passwords on HSMs.
 
-Finally, For an organisation such as Wondough Bank, software lisences may be expensive. For example, certain implementations of SQL can be highly-priced. However, similarly to HSMs, hosting services may offer a "pay-by-use" pricing system for such software, moving a single fixed cost to several smaller, variable ones.
+Finally, for an organisation such as Wondough Bank, software licenses may be expensive. For example, certain implementations of SQL can be highly-priced. However, similarly to HSMs, hosting services may offer a "pay-by-use" pricing system for such software, moving a single fixed cost to several smaller, variable ones.
 

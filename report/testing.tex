@@ -20,7 +20,7 @@ Furthermore, the Microsoft card game Elevation of Privilege \footnote{
 
 \subsubsection{Fuzzing}\label{fuzzing}
 
-Manual evaluation can only carry a security investigation so far. It is also important to test for unforseen vulnerabilities. A useful process for this is known as "Fuzzing" - endpoints are sent randomly generated data to search for unexpected behaviour.
+Manual evaluation can only carry a security investigation so far. It is also important to test for unforeseen vulnerabilities. A useful process for this is known as "Fuzzing" - endpoints are sent randomly generated data to search for unexpected behaviour.
 
 To generate fuzzing data to test the application, the software Radamsa\footnote{
     \url{https://github.com/aoh/radamsa}
@@ -40,9 +40,9 @@ The proposed testing plan provides a relatively wide range of tests, with a mix 
 
 The most significant part of the proposed security evaluation system was fuzzing. This is automated testing, so can carry out a wide range of tests far more quickly than a human tester could. Furthermore, it may be able to find errors in places that a human tester wouldn't think to check. 
 
-Fuzzing has its downsides. Since a black-box fuzzer such as Radamsa has no concept of the inner workings of a program, it may miss results which cause unintented behaviour, but do not result in an entire system crash. Any errors it does find will need to be manually analysed by a human tester before they can be fixed, and with errors produced by fuzzers this can be difficult. Finally, a fuzzer may not provide sufficient code coverage to fully test all areas of the application.  \cite{mwrFuzzing}
+Fuzzing has its downsides. Since a black-box fuzzer such as Radamsa has no concept of the inner workings of a program, it may miss results which cause unintended behaviour, but do not result in an entire system crash. Any errors it does find will need to be manually analysed by a human tester before they can be fixed, and with errors produced by fuzzers this can be difficult. Finally, a fuzzer may not provide sufficient code coverage to fully test all areas of the application.  \cite{mwrFuzzing}
 
-To attempt to fill some of the voids in code coverage left by fuzzing, white-box, manual testing and third-party black box testing were used. Both of these have their advantages - by comparing against a list of known common vulnerabilities in the white-box testing, less cybersecurity experience is required. Furthermore, the most common vulnerabilities are arguably the most likely to be exploited. 
+To attempt to fill some of the voids in code coverage left by fuzzing, white-box, manual testing and third-party black box testing were used. Both have their advantages - by comparing against a list of known common vulnerabilities in the white-box testing, less cybersecurity experience is required. Furthermore, the most common vulnerabilities are arguably the most likely to be exploited. 
 
 However, the white-box testing and third-party testing still rely on the tester having a working knowledge of cybersecurity. If this is not the case, they may miss important bugs, leaving flaws in the program. Black-box testing is also ignorant of the program's data flow, sharing many of the same problems as fuzzing.
 
@@ -56,7 +56,7 @@ Several potential vulnerabilities were found using the Elevation of Privilege ca
 
 \begin{itemize}
 
-    \item ``An attacker could try one credential after another and there’s nothing to slow them down (online or offline)'' - while this is the case in the web app, passwords are mandated to have a minimum length of 16 characters. Assuming only lower case characters are used, this provides $ \log_2 ({26}^{16}) \approx 75 $ bits of entropy - sufficient for the purposes of this application.
+    \item ``An attacker could try one credential after another and there's nothing to slow them down (online or offline)'' - while this is the case in the web app, passwords are mandated to have a minimum length of 16 characters. Assuming only lower-case characters are used, this provides $ \log_2 ({26}^{16}) \approx 75 $ bits of entropy - sufficient for the purposes of this application.
 
     \item ``An attacker can discover the fixed key being used to encrypt'' - While it would be difficult for an attacker to discover any keys within the program, it may be worth considering implementing dynamically changing keys for the database for a future design of the program.
 
@@ -68,7 +68,7 @@ In the OWASP top 10, just one vulnerability was relevant to the application's im
 
 \begin{itemize}
 
-    \item ``Insufficient Logging \& Monitoring'' - the applicatioin's logging is limited. Errors occuring in the program are handled, but not reported correctly via the logging system. A future iteration should have more detailed logs about activities in the system.
+    \item ``Insufficient Logging \& Monitoring'' - the application's logging is limited. Errors occurring in the program are handled, but not reported correctly via the logging system. A future iteration should have more detailed logs about activities in the system.
 
 \end{itemize}
 
@@ -82,7 +82,7 @@ However, while fuzzing was unable to find any security vulnerabilities, this doe
 
 \subsubsection{Third party testing}
 
-Unfortunately, the third party testing was unable to find any vulnerabilities in the code. Similarly to the result for fuzzing, this does not mean holes in the webapp's security aren't present - it is far more likely that the inexperience of the third party was responsible for more bugs not being found.
+Unfortunately, the third-party testing was unable to find any vulnerabilities in the code. Similarly to the result for fuzzing, this does not mean holes in the webapp's security aren't present - it is far more likely that the inexperience of the third party was responsible for more bugs not being found.
 
 \subsubsection{Evaluation}
 
