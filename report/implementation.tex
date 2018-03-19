@@ -2,19 +2,17 @@
 
 The implementation of the system was performed in Java, using the Spring Boot library to provide a front-end to a user. 
 
-The app is hosted at \url{https://wondough.herokuapp.com/}. \footnote{
-    Twilio's service was used to to send SMS messages to act as two-factor authentication, and a limitation of the free trial version is that only registered phone numbers may receive SMS messages. Account registration for the webapp requires a verified phone number, making it difficult for a third party to test.
-}
+The app is hosted at \url{https://wondough.herokuapp.com/}.
 
 \subsection{Scope and implementation specifics}
 
 The implementation focuses only upon the login system, and two factor authentication for it. No attempt was amde to implement any other functionality into the banking web-app.
 
+None of the dependencies used have any serious, known security flaws.
+
 \begin{itemize}
 
     \item The page is secured via an HTTPS certificate, provided by Heroku. This means that any data sent to or from the page is encrypted, defeating possible man-in-the-middle attacks. 
-
-    \item No JavaScript is used in the implementation, with CSS used to provide the type of page animations it would normally provide. 
 
     \item The system logs user actions made on the website. For the purpsoes of testing, these logs are accessible as JSON via \url{https://wondough.herokuapp.com/dumpLogs}. Logs are encrypted using a 128-bit AES cipher. 
 
@@ -38,7 +36,7 @@ A number of abstractions were made in the implementation, compared to how the we
 
     \item Normally, to prevent a user's session expiring, the expiry date on their session entry in the database would be updated every time they made an action on the page. However, since no operations can be performed, there's no way for the session token to be updated, so this functionality was left out.
 
-    \item As previously stated, the free tier of Twilio's SMS service only allows sending SMS messages to ready-verified numbers, making it difficult for a third party to test. A full implementation of the system would involve a paid tier, allowing SMS sending.
+    \item Twilio's SMS service only allows sending SMS messages to ready-verified numbers, making it difficult for a third party to test. A full implementation of the system would involve a paid tier, allowing SMS sending.
 
     \item For the purposes of testing, the {https://wondough.herokuapp.com/dumpLogs} endpoint is present in the program. This would be removed. Similarly, the code "DEBUG" will always succeed when requested for a one-time password. 
 

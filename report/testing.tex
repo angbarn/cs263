@@ -26,21 +26,23 @@ To generate fuzzing data to test the application, the software Radamsa\footnote{
     \url{https://github.com/aoh/radamsa}
 } was used. This is a dumb (or black box), mutation-based fuzzing application, which takes sample files of valid inputs to "learn" the format of data required for a program. It then attempts to gradually deviate from this format in more extreme ways over time to discover possible exploits or bugs in a program. \cite{mwrFuzzing}
 
+Fuzzing data was written to a file, and Spring Boot's testing suite used to read from the file
+
 \subsubsection{Third party testing}
 
-Finally, to attempt to achieve maximum coverage for testing, the website was sent to other students on the course for third-party penetration testing. The goal behind this was to test for slightly more specific vulnerabilities than would be possible to find with Radamsa, but which were not considered in section \ref{manualEvaluation}.
+Finally, to attempt to achieve maximum coverage for testing, the website was sent to other students on the course for third-party penetration testing. The goal behind this was to test for more specific vulnerabilities than would be possible to find with Radamsa, but which were not considered in section \ref{manualEvaluation}.
 
 Similarly to in section \ref{fuzzing}, this was black-box testing. 
 
 \subsection{Testing plan evaluation}
 
-The proposed testing plan provides a relatively wide range of tests, covering many of the issues that applications commonly face. A mix of both white-box and  black-box testing were used, as well as a mix of manual and automated testing. It is important to strike a balance between all different types of testing, as each has its own set of positive and negative aspects. 
+The proposed testing plan provides a relatively wide range of tests, with a mix of both white-box and  black-box testing were used, as well as manual and automated testing. It is important to strike a balance between all different types of testing, as each has its own set of positive and negative aspects. 
 
 The most significant part of the proposed security evaluation system was fuzzing. This is automated testing, so can carry out a wide range of tests far more quickly than a human tester could. Furthermore, it may be able to find errors in places that a human tester wouldn't think to check. 
 
-Fuzzing has its downsides. Since a black-box fuzzer such as Radamsa has no concept of the inner workings of a program, it may miss results which cause unintented behaviour, but do not result in an entire system crash. Any errors it does find will need to be manually analysed by a human tester before they can be fixed, and with errors produced by fuzzers this can be difficult. Finally, a fuzzer may not provide sufficient code coverage to fully test all areas of the application. 
+Fuzzing has its downsides. Since a black-box fuzzer such as Radamsa has no concept of the inner workings of a program, it may miss results which cause unintented behaviour, but do not result in an entire system crash. Any errors it does find will need to be manually analysed by a human tester before they can be fixed, and with errors produced by fuzzers this can be difficult. Finally, a fuzzer may not provide sufficient code coverage to fully test all areas of the application.  \cite{mwrFuzzing}
 
-To attempt to fill some of the voids in code coverage left by fuzzing, manual testing in the form of white-box testing and third-party black box testing were used. Both of these have their advantages - by comparing against a list of known common vulnerabilities in the white-box testing, less cybersecurity experience is required. Furthermore, the most common vulnerabilities are arguably the most likely to be exploited. 
+To attempt to fill some of the voids in code coverage left by fuzzing, white-box, manual testing and third-party black box testing were used. Both of these have their advantages - by comparing against a list of known common vulnerabilities in the white-box testing, less cybersecurity experience is required. Furthermore, the most common vulnerabilities are arguably the most likely to be exploited. 
 
 However, the white-box testing and third-party testing still rely on the tester having a working knowledge of cybersecurity. If this is not the case, they may miss important bugs, leaving flaws in the program. Black-box testing is also ignorant of the program's data flow, sharing many of the same problems as fuzzing.
 
@@ -66,17 +68,17 @@ In the OWASP top 10, just one vulnerability was relevant to the application's im
 
 \begin{itemize}
 
-    \item ``Insufficient Logging \& Monitoring'' - the applicatioin's logging is limited. For example, errors occuring in the program are generally handled, but not reported correctly via the logging system. A future iteration should have more detailed logs about activities in the system.
+    \item ``Insufficient Logging \& Monitoring'' - the applicatioin's logging is limited. Errors occuring in the program are handled, but not reported correctly via the logging system. A future iteration should have more detailed logs about activities in the system.
 
 \end{itemize}
 
 \subsubsection{Fuzzing}
 
-Overall, the application handled the fuzzing provided well. This could be for a variety of reasons. Firstly, Java's String management is relatively secure compared to a programming language such as C. Since all requests ultimately take the form of strings, it was very difficult for the fuzzing software to find a string that Java could not handle by itself.
+Overall, the application handled the fuzzing test well. This could be for a variety of reasons. Firstly, Java's String management is relatively secure compared to a programming language such as C. Since all requests ultimately take the form of strings, it was very difficult for the fuzzing software to find a string that Java could not handle by itself.
 
-Furthermore, any parsing of strings was performed by Java's in-built methods, meaning they were well implemnted and tested. Exceptions thrown by these methods were caught correctly and dealt with appropriately, preventing complications elsewhere in the program.
+Furthermore, any parsing of strings was performed by Java's in-built methods, rather than first-party alternatives. Exceptions thrown by these methods were caught and dealt with appropriately, preventing complications elsewhere in the program.
 
-However, while fuzzing was unable to find any security vulnerabilities, this is unlikely to mean there aren't any present in the program. Due to resource constraints, a sample size of data in the 100s was taken. It may be possible that a sample size several orders of magnitude higher would yield possible vulnerabilities within the program. 
+However, while fuzzing was unable to find any security vulnerabilities, this does not mean there aren't any present in the program. Due to resource constraints, a sample size of data in the 100s was taken. It may be possible that a sample size several orders of magnitude higher would yield possible vulnerabilities within the program. 
 
 \subsubsection{Third party testing}
 
