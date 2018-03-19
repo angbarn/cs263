@@ -26,13 +26,9 @@ There are a number of slightly unique or novel security measures in the proposed
 
 \subsubsection{Customer support verification}
 
-One common attack vector for bank customers is impersonating a member of customer support. Similarly, a member of customer support could potentially “go rogue” and attack a customer's account.
+One common attack vector for bank customers is impersonating a member of customer support. Similarly, a member of customer support could potentially ``go rogue'' and attack a customer's account.
 
-While many consider phonelines to be a safe method of communication, “vishing” or “voice phishing” is on the rise. \cite{bbcPhone} \cite{bbcSmishing} Phone number spoofing can make an illegitimate call appear to be from a legitimate source. Holding open a line\footnote{
-    During a landline phone call, depending on the network's configuration, a line may be kept open after a receiver has hung up. For a short window of time, future calls they make will reuse the same line to the original caller. \cite{conArtists}
-} can redirect a call from a customer to their bank towards an attacker.
-
-Such techniques mean that verification of both Wondough Bank's staff members and customers is necessary in every situation. The proposed system to satisfy such a goal is displayed in figure \ref{customerSupport}.
+While many consider phonelines to be a safe method of communication, ``vishing'' or ``voice phishing'' is on the rise. \cite{bbcPhone} \cite{bbcSmishing} \cite{conArtists}. Such techniques mean that verification of both Wondough Bank's staff members and customers is necessary in every situation. The proposed system to satisfy such a goal is displayed in figure \ref{customerSupport}.
 
 \begin{figure}
     \includegraphics[width=\columnwidth]{images/customer-support}
@@ -193,11 +189,11 @@ There are a wide variety of possible attacks upon the proposed Wondough bank sys
     \\ \hline \ref{impersonateCustomerSupport} & 
         Customer support will be required to log in using two-factor authentication. They are authenticated to the user via a one-time access code.
     \\ \hline \ref{impersonateMerchant} &
-        Upon an initial connection, a merchant is required to provide their Identifying Name, which is used to fetch a corresponding secret key from the database. All future traffic between parties is encrypted using this secret key.
+        Upon an initial connection, a merchant provides their Identifying Name, and a corresponding key is fetched from the database. All future traffic between parties is encrypted.
     \\ \hline \ref{impersonateIt} &
-        IT staff must undergo two-factor authentication before connecting to the database. A possible method to secure this attack surface further is to issue IT staff employee cards and card readers. Similarly to a home-banking card reader, these could provide a one time login code for the IT member.
+        IT staff must use two-factor authentication to connect to the database. A possible improvement would be to issue IT staff ID cards and card readers. Similarly to a home-banking card reader, these could provide a one time login code for the IT member.
     \\ \hline \ref{impersonateWebserver} &
-        All webserver connections will be secured using HTTPS, providing a digital certificate.
+        All webserver connections will be secured using HTTPS, which provides a digital certificate.
     \\ \hline \ref{tamperAccountDatabase} \ref{tamperMerchantDatabase} &
         Only other servers will be given editing permissions for databases.
     \\ \hline \ref{tamperSupportTickets} &
@@ -205,9 +201,9 @@ There are a wide variety of possible attacks upon the proposed Wondough bank sys
     \\ \hline \ref{repudiationFraud} &
         All connections to the webserver are made via HTTPS, thus removing the possibility of man-in-the-middle fraud. All log-ins to the website require two-factor authentication. All customer support changes require a code provided by the customer themselves.
     \\ \hline \ref{repudiationIt} \ref{repudiationCustomerSupport} &
-        All staff members must access the server through secure channels such as SSH or HTTPS using two-factor authentication, guaranteeing non-repudiation. 
+        All staff members must access the server using two-factor authentication, guaranteeing non-repudiation. 
     \\ \hline \ref{disclosureCustomerSupport} &
-        Customer support staff do not have the necessary access permissions to even access a customer's account details, without the customer first providing them with their account ID and a one-time password.
+        Customer support staff do not have the necessary access permissions for a customer's account details without the customer first providing them with their account ID and a one-time password.
     \\ \hline \ref{disclosureItDetails} \ref{disclosureItKeys} &
         The database will be encrypted, and neceessary keys for decryption will be stored on HSMs, secured from IT staff.
     \\ \hline \textcolor{red}{\ref{dosWebsite}} &
@@ -248,19 +244,19 @@ There are a number of other considerations which must be considered for the desi
 
 \subsubsection{Legal requirements}
 
-While there are many legal requirements for a business such as Wondough Bank, arguably the most important two are the UK's Data Protection Act from 1998 \ref{dataProtectionAct}, and the EU's General Data Protection Regulation, which will come in to force in 2018 \ref{generalDataProtectionRegulation}. 
+While there are many legal requirements for a business such as Wondough Bank, arguably the most important two are the UK's Data Protection Act from 1998 \cite{dataProtectionAct}, and the EU's General Data Protection Regulation, which will come in to force in 2018 \cite{generalDataProtectionRegulation}. 
 
 The Data Protect Act states that data must be kept securely. As a banking application, security requirements are higher than for the general case web serice that The Data Protection Act was written for, so meeting these would not be a concern. However, the act states that data cannot be transmitted outside the European Economic Area without adequate protection. If Wondough Bank were to host their website using a cloud service, it may be necessary to ensure any data sent outside of the country was done so with adequate protection.
 
-The EU's General Data Protecion Regulation is similar to the Data Protection Act, but provides more rights to a service's customers. For example, the act mandates that all data breaches are announced within 72 hours. The Wondough Bank system must be design in such a way that such breaches can be detected and reported on quickly and efficiently to stay within the bounds of the law.
+The EU's General Data Protecion Regulation is similar to the Data Protection Act, but provides more rights to a service's customers. For example, the act mandates that all data breaches are announced within 72 hours.
 
 \subsubsection{Economic constraints}
 
-A system which fully meets or exceeds all requirements may still be prohibitively expensive for a small scale, start-up company like Wondough Bank to deploy, and thus may be unrealistic. It is necessary to consider the compromises which have to be made when designing such a system. 
+A system which fully meets or exceeds all requirements may still be prohibitively expensive for a small scale, start-up company like Wondough Bank to deploy, and thus may be unrealistic. It is necessary to compromise when designing such a system. 
 
-Firstly, the choice of server host is important. While larger banks are able to afford their own dedicated servers for online banking, it may be necessary for a company on the scale of Wondough Bank to turn to a cloud-based hosting service such as Amazon Web Services or Microsoft Azure. While an in-house hosting solution may be cheaper in the long run, an organisation such as Wondough Bank may be unable to meet the necessary up-front expenditure.
+Firstly, the choice of server host is important. Larger banks are able to afford their own dedicated servers for online banking, but it may be necessary for a company on the scale of Wondough Bank to turn to a cloud-based hosting service such as Amazon Web Services or Microsoft Azure. While an in-house hosting solution may be cheaper in the long run, an organisation such as Wondough Bank may be unable to meet the necessary up-front expenditure.
 
-However, hosting Wondough Bank's web-app in the cloud has some key advantages. Firstly, while the organisation is currently small, their intended scope for expansion is large. This is an area in which cloud services excel, and Wondough would need only to pay for any increased usage. If Wondough Bank were to install their own hosting infrastructure, they may find future expansion or upgrades costly.
+However, hosting Wondough Bank's web-app in the cloud has some key advantages. Cloud services excel at providing the type of expansion Wondough Bank is hoping to achieve, and Wondough would need only to pay for any increased usage. If Wondough Bank were to install their own hosting infrastructure, future expansion could be costly.
 
 Also, many hosts are willing to accept a large part of the responsibility for the security of data transmitted and stored on their servers. This means that Wondough Bank's resources may be focused more in other areas, and allows them to transfer risk to third parties. However, this may be disadvantageous, and Wondough Bank may want to be certain exactly what level of security data is afforded - a task which could be difficult when dealing with a large hosting company.
 
