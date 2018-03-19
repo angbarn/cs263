@@ -221,7 +221,7 @@ There are a wide variety of possible attacks upon the proposed Wondough bank sys
     \\ \hline \ref{dosBillingServer} &
         The billing server will be internal to Wondough Bank, so external DoS attacks will be impossible. 
     \\ \hline \ref{dosBankingServer} &
-        All banking server requests with an invalid Identifying Name will be rejected immediately.
+        All banking server requests with an invalid Identifying Name, timestamp or MAC will be rejected immediately.
     \\ \hline \textcolor{red}{\ref{dosLogs}} &
         This is a possible flaw in the system's design. For example, deliberately failing to log in repeatedly would write a lot of data to the logging system. Since this data is encrypted, this could be an expensive operation, and effectively perform a DoS attack on the logging server.
 
