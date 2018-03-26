@@ -28,7 +28,7 @@ public class AesEncryption {
     /**
      * Algorithm to use for encryption/decryption
      */
-    private static final String ALGO = "AES";
+    private static final String ALGORITHM = "AES";
 
     /**
      * Length of key in bytes
@@ -43,19 +43,21 @@ public class AesEncryption {
      *
      * @param data The data to process
      * @param password The password to encrypt/decrypt with
-     * @param opmode Whether to encrypt or decrypt
+     * @param operation Whether to encrypt or decrypt
+     * @return Encrypted or decrypted bytes of data
      */
-    private static byte[] swap(byte[] data, String password, int opmode) {
-        if (opmode != Cipher.DECRYPT_MODE && opmode != Cipher.ENCRYPT_MODE) {
+    private static byte[] swap(byte[] data, String password, int operation) {
+        if (operation != Cipher.DECRYPT_MODE
+                && operation != Cipher.ENCRYPT_MODE) {
             throw new IllegalArgumentException("Must encrypt or decrypt");
         }
 
         byte[] widthPassword = enforcePasswordLength(password);
-        Key key = new SecretKeySpec(widthPassword, 0, KEY_LENGTH, ALGO);
+        Key key = new SecretKeySpec(widthPassword, 0, KEY_LENGTH, ALGORITHM);
 
         try {
-            Cipher c = Cipher.getInstance(ALGO);
-            c.init(opmode, key);
+            Cipher c = Cipher.getInstance(ALGORITHM);
+            c.init(operation, key);
 
             // Do the business
             return c.doFinal(data);
@@ -66,10 +68,26 @@ public class AesEncryption {
         }
     }
 
+    /**
+     * Thin wrapper for {@link AesEncryption#swap} for encrypting
+     *
+     * @param data The data to encrypt
+     * @param password The password to use to encrypt it
+     * @return Encrypted data
+     * @see AesEncryption#swap
+     */
     public static byte[] encrypt(byte[] data, String password) {
         return swap(data, password, Cipher.ENCRYPT_MODE);
     }
 
+
+    /**
+     * Thin wrapper for {@link AesEncryption#swap} for decrypting
+     * @param data The data to decrypt
+     * @param password The password to use to decrypt it
+     * @return Decrypted data
+     * @see AesEncryption#swap
+     */
     public static byte[] decrypt(byte[] data, String password) {
         return swap(data, password, Cipher.DECRYPT_MODE);
     }
@@ -81,6 +99,7 @@ public class AesEncryption {
      * of bits.
      *
      * @param password Password to enforce length for
+     * @return A key which is the exact bit-length required for AES
      */
     private static byte[] enforcePasswordLength(String password) {
         return enforcePasswordLength(password.getBytes());
@@ -93,6 +112,7 @@ public class AesEncryption {
      * of bits.
      *
      * @param password Password to enforce length for
+     * @return A key which is the exact bit-length required for AES
      */
     private static byte[] enforcePasswordLength(byte[] password) {
         byte[] passwordHash;

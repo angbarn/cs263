@@ -1,0 +1,43 @@
+\section{Implementation}
+
+The implementation of the system was performed in Java, using the Spring Boot library to provide a front-end to a user. 
+
+The app is hosted at \url{https://wondough.herokuapp.com/}.
+
+\subsection{Scope and implementation specifics}
+
+The implementation focuses only upon the login system, and two factor authentication for it. No attempt was made to implement any other functionality into the banking web-app.
+
+None of the dependencies used have any serious, known security flaws.
+
+\begin{itemize}
+
+    \item The page is secured via an HTTPS certificate, provided by Heroku. This means that any data sent to or from the page is encrypted, defeating possible man-in-the-middle attacks. 
+
+    \item The system logs user actions made on the website. For the purposes of testing, these logs are accessible as JSON via \url{https://wondough.herokuapp.com/dumpLogs}. Logs are encrypted using a 128-bit AES cipher. 
+
+    \item The system uses Twilio's free trial to provide SMS-based two-factor authentication. 
+
+    \item Users can register through the website using their details and a valid phone number. Upon account creation, a user is texted their new account ID so that they may log in through the front-page of the website. This, combined with 2FA being mandatory, effectively acts as verification for an input phone number.
+
+    \item Keys are stored as environment variables, which are set up using Heroku's management page. This keeps them out of the source code or out of a repository. 
+
+\end{itemize}
+
+\subsection{Simplifications and alterations}
+
+A few abstractions were made in the implementation, compared to how the web-app would function in a real-world production environment. 
+
+\begin{itemize}
+
+    \item Rather than keys being stored as environment variables on Heroku's servers. One method of storage would be secure key storage available from a hosting provider such as Amazon Web Services' Key Management Service. Alternatively, hardware security modules could store keys more securely than otherwise possible.
+
+    \item The SQL database would be encrypted, with SQL roles being used to provide different levels of access to the database.
+
+    \item Normally, to prevent a user's session expiring, the expiry date on their session entry in the database would be updated every time they made an action on the page. However, since no operations can be performed, there's no way for the session token to be updated, so this functionality was left out.
+
+    \item Twilio's SMS service only allows sending SMS messages to ready-verified numbers, making it difficult for a third party to test. A full implementation of the system would involve a paid tier, allowing SMS sending.
+
+    \item For the purposes of testing, the {https://wondough.herokuapp.com/dumpLogs} endpoint is present in the program. This would be removed. Similarly, the code "DEBUG" will always succeed when requested for a one-time password. 
+
+\end{itemize}

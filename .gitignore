@@ -4,9 +4,6 @@
 # Log file
 *.log
 
-# BlueJ files
-*.ctxt
-
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
@@ -23,3 +20,17 @@ hs_err_pid*
 
 #idea
 .idea/*
+
+
+
+
+
+target/*
+*.pdf
+
+.idea/*
+.settings/*
+dummySend.txt
+.classpath
+.project
+*.gz

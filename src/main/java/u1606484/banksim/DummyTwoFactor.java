@@ -51,7 +51,7 @@ public class DummyTwoFactor implements ITwoFactorService {
     }
 
     @Override
-    public int getWindowSize() {
+    public int getWindowCount() {
         return otacStepWindow;
     }
 }
